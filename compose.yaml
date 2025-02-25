@@ -1,0 +1,18 @@
+﻿services:
+  gatewayservice:
+    image: gatewayservice
+    build:
+      context: .
+      dockerfile: GatewayService/Dockerfile
+
+  messagingservice:
+    image: messagingservice
+    build:
+      context: .
+      dockerfile: MessagingService/Dockerfile
+
+  storageservice:
+    image: storageservice
+    build:
+      context: .
+      dockerfile: StorageService/Dockerfile
