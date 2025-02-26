@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option csharp_namespace = "MessagingService";
+
+import "google/protobuf/empty.proto";
+
+package MessageRpc;
+
+service MessageServiceRpc {
+  rpc SendMessage (SendMessageRequestRpc) returns (google.protobuf.Empty);
+}
+
+message SendMessageRequestRpc {
+  string messageText = 1;
+}

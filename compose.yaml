@@ -1,18 +1,125 @@
-﻿services:
+﻿volumes:
+  kafka-1-data:
+  kafka-2-data:
+  kafka-3-data:
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka-1:
+    image: confluentinc/cp-kafka:latest
+    restart: always
+    ports:
+      - '9091:9091'
+      - '29091:29091'
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_RACK: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+              
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INTERNAL
+      KAFKA_LISTENERS: LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29091
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_INTERNAL://kafka-1:9091,LISTENER_LOCAL://localhost:29091
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INTERNAL:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
+        
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+    volumes:
+      - kafka-1-data:/var/lib/kafka1/data
+    depends_on:
+      - zookeeper
+
+  kafka-2:
+    image: confluentinc/cp-kafka:latest
+    restart: always
+    ports:
+      - "9092:9092"
+      - '29092:29092'
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_BROKER_RACK: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INTERNAL
+      KAFKA_LISTENERS: LISTENER_INTERNAL://:9092,LISTENER_LOCAL://:29092
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_INTERNAL://kafka-2:9092,LISTENER_LOCAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INTERNAL:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
+
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+    volumes:
+      - kafka-2-data:/var/lib/kafka2/data
+    depends_on:
+      - zookeeper
+
+  kafka-3:
+    image: confluentinc/cp-kafka:latest
+    restart: always
+    ports:
+      - "9093:9093"
+      - '29093:29093'
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_BROKER_RACK: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INTERNAL
+      KAFKA_LISTENERS: LISTENER_INTERNAL://:9093,LISTENER_LOCAL://:29093
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_INTERNAL://kafka-3:9093,LISTENER_LOCAL://localhost:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INTERNAL:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
+
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+    volumes:
+      - kafka-3-data:/var/lib/kafka3/data
+    depends_on:
+      - zookeeper
+        
+        
+#  automatically creates requested kafka topics
+  init-topics:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until kafka is reachable
+      echo -e 'Existing topics:'
+      kafka-topics --bootstrap-server kafka-1:9091 --list
+
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server kafka-1:9091 --create --if-not-exists --topic NewMessages --replication-factor 3 --partitions 3
+
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafka-1:9091 --list
+      "
+  
   gatewayservice:
     image: gatewayservice
+    restart: always
     build:
       context: .
       dockerfile: GatewayService/Dockerfile
 
   messagingservice:
     image: messagingservice
+    restart: always
     build:
       context: .
       dockerfile: MessagingService/Dockerfile
 
   storageservice:
     image: storageservice
+    restart: always
     build:
       context: .
       dockerfile: StorageService/Dockerfile
+      
+  
