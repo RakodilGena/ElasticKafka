@@ -1,7 +1,14 @@
 using MessagingService.Grpc;
-using MessagingService.Kafka.Producers;
+using MessagingService.Kafka;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ConfigureEndpointDefaults(x =>
+        x.Protocols = HttpProtocols.Http2);
+});
 
 // Add services to the container.
 builder.Services.AddGrpc();

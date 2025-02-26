@@ -8,14 +8,14 @@ namespace MessagingService.Grpc;
 public sealed class MessageService : MessageServiceRpc.MessageServiceRpcBase
 {
     private readonly ILogger<MessageService> _logger;
-    private readonly IMessageProducer _messageProducer;
+    private readonly INewMessageProducer _newMessageProducer;
 
     public MessageService(
         ILogger<MessageService> logger, 
-        IMessageProducer messageProducer)
+        INewMessageProducer newMessageProducer)
     {
         _logger = logger;
-        _messageProducer = messageProducer;
+        _newMessageProducer = newMessageProducer;
     }
 
     public override async Task<Empty> SendMessage(
@@ -30,7 +30,7 @@ public sealed class MessageService : MessageServiceRpc.MessageServiceRpcBase
             messageId,
             request.MessageText);
         
-        await _messageProducer.ProduceAsync(requestDto);
+        await _newMessageProducer.ProduceAsync(requestDto);
         
         return new Empty();
     }

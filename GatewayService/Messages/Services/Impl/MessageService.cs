@@ -19,7 +19,11 @@ internal sealed class MessageService : IMessageService
 
     public async Task SendMessageAsync(SendMessageRequest request)
     {
-        using var channel = GrpcChannel.ForAddress(_urlProvider.GetUrl());
+        var url = _urlProvider.GetUrl();
+        
+        _logger.LogInformation("Sending message to Messaging Service, {url}", url);
+        
+        using var channel = GrpcChannel.ForAddress(url);
         var client = new MessageServiceRpc.MessageServiceRpcClient(channel);
         
         var rpcRequest = new SendMessageRequestRpc
@@ -28,5 +32,7 @@ internal sealed class MessageService : IMessageService
         };
         
         await client.SendMessageAsync(rpcRequest);
+        
+        _logger.LogInformation("Message successfully sent to Messaging Service");
     }
 }

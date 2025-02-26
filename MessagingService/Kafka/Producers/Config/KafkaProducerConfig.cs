@@ -1,6 +1,6 @@
 ﻿using Confluent.Kafka;
 
-namespace MessagingService.Kafka.Producers;
+namespace MessagingService.Kafka.Producers.Config;
 
 internal sealed class KafkaProducerConfig
 {

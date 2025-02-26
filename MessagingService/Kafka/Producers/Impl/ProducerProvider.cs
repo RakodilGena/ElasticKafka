@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using MessagingService.Kafka.Producers.Config;
 using Microsoft.Extensions.Options;
 
 namespace MessagingService.Kafka.Producers.Impl;

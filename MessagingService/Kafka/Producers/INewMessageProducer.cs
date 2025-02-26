@@ -2,7 +2,7 @@
 
 namespace MessagingService.Kafka.Producers;
 
-public interface IMessageProducer
+public interface INewMessageProducer
 {
     Task ProduceAsync(SendMessageRequestDto request);
 }
