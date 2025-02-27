@@ -102,21 +102,21 @@ services:
       kafka-topics --bootstrap-server kafka-1:9091 --list
       "
   
-  gatewayservice:
+  gateway-service:
     image: gatewayservice
     restart: always
     build:
       context: .
       dockerfile: GatewayService/Dockerfile
 
-  messagingservice:
+  messaging-service:
     image: messagingservice
     restart: always
     build:
       context: .
       dockerfile: MessagingService/Dockerfile
 
-  storageservice:
+  storage-service:
     image: storageservice
     restart: always
     build:
