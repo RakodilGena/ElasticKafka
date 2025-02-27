@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using GatewayService.Kafka.Consumers.MessageCreatedEvents.Config;
+using GatewayService.SignalR;
 using Microsoft.Extensions.Options;
 
 namespace GatewayService.Kafka.Consumers.MessageCreatedEvents;
@@ -96,20 +97,16 @@ internal sealed class MessageCreatedEventsConsumer : BackgroundService
         await SendMessageCreatedNotificationAsync(messageId, ct);
     }
 
-    private Task SendMessageCreatedNotificationAsync(
+    private async Task SendMessageCreatedNotificationAsync(
         Guid messageId,
         CancellationToken ct)
     {
-        //todo: send signalR message
+        _logger.LogInformation("MessageCreatedEventsConsumer sending notification about created message [{messageId}]",
+            messageId);
 
-        _logger.LogInformation("MessageCreatedEventsConsumer haven't yet send notification [{messageId}]", messageId);
+        using var scope = _serviceScopeFactory.CreateScope();
+        var hub = scope.ServiceProvider.GetRequiredService<IMessageCreatedEventsHubWrapper>();
 
-        return Task.FromResult(true);
-
-        //using var serviceScope = _serviceScopeFactory.CreateScope();
-        // var createMessageService = scope.ServiceProvider.GetRequiredService<ICreateMessageService>();
-        // var newMessage = kafkaNewMessage.ToDto();
-        //
-        // return await createMessageService.TryCreateMessage(newMessage, ct);
+        await hub.NotifyMessageCreated(messageId, ct);
     }
 }

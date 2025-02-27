@@ -5,9 +5,9 @@ namespace GatewayService.Extensions;
 
 internal static class StartupExtensions
 {
-    public static WebApplicationBuilder AddSwagger(this WebApplicationBuilder builder)
+    public static IServiceCollection AddSwagger(this IServiceCollection services)
     {
-        builder.Services.AddSwaggerGen(options =>
+        services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new OpenApiInfo
             {
@@ -58,7 +58,7 @@ internal static class StartupExtensions
         });
 
 
-        return builder;
+        return services;
     }
 
     public static void UseSwagger(this WebApplication app)

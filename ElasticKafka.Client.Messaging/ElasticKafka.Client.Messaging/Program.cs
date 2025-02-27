@@ -3,8 +3,15 @@
 using System.Net.Http.Json;
 using System.Text;
 using ElasticKafka.Client.Messaging;
+using Microsoft.AspNetCore.SignalR.Client;
 
 Console.WriteLine("Welcome to ElasticKafka Messaging!");
+Console.WriteLine();
+
+
+await EstablishSignalRConnectionAsync();
+
+Console.WriteLine("Connection established, you can proceed to work.");
 Console.WriteLine();
 
 Console.WriteLine("You may input your message and then send it with \"Enter\"");
@@ -48,6 +55,40 @@ while (true)
     }
 }
 
+
+async Task EstablishSignalRConnectionAsync()
+{
+    Console.WriteLine("Establishing connection to MessagesHub...");
+    
+    string groupId = "MessageCreatedEventReceivers";
+
+    var baseUrl = GatewayUrls.Get();
+    string hubUrl = $"{baseUrl}/messagesHub";
+
+    var connection = new HubConnectionBuilder()
+        .WithUrl(hubUrl)
+        .WithAutomaticReconnect() // Enables auto-reconnect
+        .Build();
+
+    connection.On<string>("MessageCreated", messageId =>
+    {
+        Console.WriteLine($"[Message created]: ID = {messageId}");
+        Console.WriteLine();
+    });
+
+    try
+    {
+        await connection.StartAsync();
+        Console.WriteLine($"Connected to SignalR Messages Hub, url: {hubUrl}");
+
+        await connection.InvokeAsync("JoinGroup", groupId);
+        Console.WriteLine($"Joined group: {groupId}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error connecting to SignalR: {ex.Message}");
+    }
+}
 
 async Task SendMessageAsync()
 {

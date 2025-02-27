@@ -101,6 +101,13 @@ services:
       echo -e 'Successfully created the following topics:'
       kafka-topics --bootstrap-server kafka-1:9091 --list
       "
+      
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: always
   
   gateway-service:
     image: gatewayservice
@@ -108,6 +115,8 @@ services:
     build:
       context: .
       dockerfile: GatewayService/Dockerfile
+    depends_on:
+      - redis
 
   messaging-service:
     image: messagingservice
