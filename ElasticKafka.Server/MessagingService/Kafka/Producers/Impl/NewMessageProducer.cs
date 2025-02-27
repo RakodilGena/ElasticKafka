@@ -50,6 +50,7 @@ internal sealed class NewMessageProducer : INewMessageProducer
             kafkaOrder,
             KafkaJsonSerializerOptions.Default);
 
+        //key is there to determine the partition (hash -> partition)
         return new Message<string, string>
         {
             Key = messageId,
