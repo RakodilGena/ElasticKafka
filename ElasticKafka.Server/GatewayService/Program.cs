@@ -1,12 +1,14 @@
 using GatewayService.Extensions;
-using GatewayService.Messages.Services;
+using GatewayService.Kafka;
+using GatewayService.NewMessages.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-
 builder.Services.AddMessageServices();
+
+builder.Services.AddKafka();
 
 builder.AddSwagger();
 
