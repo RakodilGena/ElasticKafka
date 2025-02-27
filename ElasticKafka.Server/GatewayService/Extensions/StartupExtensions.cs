@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using Microsoft.OpenApi.Models;
 
 namespace GatewayService.Extensions;
@@ -57,6 +58,36 @@ internal static class StartupExtensions
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
 
+
+        return services;
+    }
+    
+    public static IServiceCollection AddCorsDefaultPolicy(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var allowOrigins =
+            configuration.GetSection("AllowOrigins").Get<string>() ??
+            string.Empty;
+
+        string[] allowedOrigins = !string.IsNullOrEmpty(allowOrigins)
+            ? allowOrigins.Split(",")
+            : [];
+        
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(
+                builder =>
+                {
+                    builder.AllowAnyMethod().AllowAnyHeader();
+                    if (allowedOrigins.Length > 0)
+                        builder.WithOrigins(allowedOrigins);
+                    else
+                        builder.SetIsOriginAllowed(_ => true);
+                    builder.AllowCredentials();
+                });
+            Trace.TraceInformation(allowOrigins);
+        });
 
         return services;
     }

@@ -2,7 +2,7 @@
 
 internal static class GatewayUrls
 {
-    private const string Urls = "http://localhost:5100";
+    private const string Urls = "http://localhost:5101,http://localhost:5102";
 
     public static string Get()
     {

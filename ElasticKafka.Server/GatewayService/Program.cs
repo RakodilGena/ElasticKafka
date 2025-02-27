@@ -2,6 +2,7 @@ using GatewayService.Extensions;
 using GatewayService.Kafka;
 using GatewayService.NewMessages.Services;
 using GatewayService.SignalR;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,8 @@ builder.Services
     .AddMessageServices()
     .AddKafka()
     .AddCustomSignalR(builder.Configuration)
-    .AddSwagger();
+    .AddSwagger()
+    .AddCorsDefaultPolicy(builder.Configuration);
 
 
 var app = builder.Build();
@@ -25,6 +27,12 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCustomSignalR();
+
+app.UseCors();
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.MapControllers();
 

@@ -9,13 +9,15 @@ Console.WriteLine("Welcome to ElasticKafka Messaging!");
 Console.WriteLine();
 
 
-await EstablishSignalRConnectionAsync();
+var success = await TryEstablishSignalRConnectionAsync();
+if (success is false)
+    return;
 
 Console.WriteLine("Connection established, you can proceed to work.");
 Console.WriteLine();
 
 Console.WriteLine("You may input your message and then send it with \"Enter\"");
-Console.WriteLine("You may press \"Shift+Backspace\" to completely erase your message.");
+//Console.WriteLine("You may press \"Shift+Backspace\" to completely erase your message.");
 Console.WriteLine("You may press \"F1\" to exit application.");
 Console.WriteLine();
 
@@ -56,7 +58,7 @@ while (true)
 }
 
 
-async Task EstablishSignalRConnectionAsync()
+async Task<bool> TryEstablishSignalRConnectionAsync()
 {
     Console.WriteLine("Establishing connection to MessagesHub...");
     
@@ -83,10 +85,13 @@ async Task EstablishSignalRConnectionAsync()
 
         await connection.InvokeAsync("JoinGroup", groupId);
         Console.WriteLine($"Joined group: {groupId}");
+        
+        return true;
     }
     catch (Exception ex)
     {
         Console.WriteLine($"Error connecting to SignalR: {ex.Message}");
+        return false;
     }
 }
 
@@ -100,18 +105,17 @@ async Task SendMessageAsync()
     
     var message = input.ToString();
     input.Clear();
+    
+    var baseUrl = GatewayUrls.Get();
+    var url = new Uri($"{baseUrl}/api/messages");
 
-    Console.WriteLine($"Sending message [{message}]");
+    Console.WriteLine($"Sending message [{message}], url: {url}");
 
     var request = new SendMessageRequest(message);
     
     var httpClientFactory = GlobalServiceProvider.GetService<IHttpClientFactory>();
 
     var client = httpClientFactory.CreateClient();
-
-    var baseUrl = GatewayUrls.Get();
-    
-    var url = new Uri($"{baseUrl}/api/messages");
     
     await client.PostAsJsonAsync(url, request);
     //await Task.Yield();

@@ -17,7 +17,7 @@ internal sealed class MessageServiceUrlProvider : IMessageServiceUrlProvider
     {
         var urlString = _options.Value.Value;
         
-        var urls = urlString.Split(";");
+        var urls = urlString.Split(",");
         
         if (urls.Length is 1)
             return urls[0];

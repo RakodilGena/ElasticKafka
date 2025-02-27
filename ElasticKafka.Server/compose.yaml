@@ -96,7 +96,7 @@ services:
 
       echo -e 'Creating kafka topics'
       kafka-topics --bootstrap-server kafka-1:9091 --create --if-not-exists --topic NewMessages --replication-factor 3 --partitions 3
-      kafka-topics --bootstrap-server kafka-1:9091 --create --if-not-exists --topic MessageCreatedEvents --replication-factor 3 --partitions 3
+      kafka-topics --bootstrap-server kafka-1:9091 --create --if-not-exists --topic MessageCreatedEvents --replication-factor 3 --partitions 2
 
       echo -e 'Successfully created the following topics:'
       kafka-topics --bootstrap-server kafka-1:9091 --list
@@ -109,27 +109,158 @@ services:
       - "6379:6379"
     restart: always
   
-  gateway-service:
+  gateway-service-1:
     image: gatewayservice
     restart: always
     build:
       context: .
       dockerfile: GatewayService/Dockerfile
+    ports:
+      - "5101:8080"
+    environment:
+      "MessageServicesUrls:Value": "http://messaging-service-1:8080,http://messaging-service-2:8080,http://messaging-service-3:8080"
+      
+      "Redis:ConnectionString": "redis:6379"
+      
+      "Kafka:Consumers:MessageCreatedEvents:Topic": "MessageCreatedEvents"
+      "Kafka:Consumers:MessageCreatedEvents:Config:GroupId": "gw_service_message_created_events"
+      "Kafka:Consumers:MessageCreatedEvents:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Consumers:MessageCreatedEvents:Config:EnableAutoCommit": "false"
+      
+      "AllowOrigins": "http://localhost"
     depends_on:
       - redis
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      
+  gateway-service-2:
+    image: gatewayservice
+    restart: always
+    build:
+      context: .
+      dockerfile: GatewayService/Dockerfile
+    ports:
+      - "5102:8080"
+    environment:
+      "MessageServicesUrls:Value": "http://messaging-service-1:8080,http://messaging-service-2:8080,http://messaging-service-3:8080"
 
-  messaging-service:
+      "Redis:ConnectionString": "redis:6379"
+
+      "Kafka:Consumers:MessageCreatedEvents:Topic": "MessageCreatedEvents"
+      "Kafka:Consumers:MessageCreatedEvents:Config:GroupId": "gw_service_message_created_events"
+      "Kafka:Consumers:MessageCreatedEvents:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Consumers:MessageCreatedEvents:Config:EnableAutoCommit": "false"
+      
+      "AllowOrigins": "http://localhost"
+    depends_on:
+      - redis
+      - kafka-1
+      - kafka-2
+      - kafka-3
+  
+  messaging-service-1:
     image: messagingservice
     restart: always
     build:
       context: .
       dockerfile: MessagingService/Dockerfile
-
-  storage-service:
+    environment:
+      "Kafka:Producer:NewMessagesTopic": "NewMessages"
+      "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+    depends_on:
+      - redis
+      - kafka-1
+      - kafka-2
+      - kafka-3
+        
+  
+  messaging-service-2:
+    image: messagingservice
+    restart: always
+    build:
+      context: .
+      dockerfile: MessagingService/Dockerfile
+    environment:
+      "Kafka:Producer:NewMessagesTopic": "NewMessages"
+      "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+    depends_on:
+      - redis
+      - kafka-1
+      - kafka-2
+      - kafka-3
+        
+    
+  messaging-service-3:
+    image: messagingservice
+    restart: always
+    build:
+      context: .
+      dockerfile: MessagingService/Dockerfile
+    environment:
+      "Kafka:Producer:NewMessagesTopic": "NewMessages"
+      "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+    depends_on:
+      - redis
+      - kafka-1
+      - kafka-2
+      - kafka-3
+  
+      
+  storage-service-1:
     image: storageservice
     restart: always
     build:
       context: .
       dockerfile: StorageService/Dockerfile
-      
+    environment:
+      "Kafka:Producer:MessageCreatedEventsTopic": "MessageCreatedEvents"
+      "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Consumers:NewMessages:Topic": "NewMessages"
+      "Kafka:Consumers:NewMessages:Config:GroupId": "messaging_service_new_messages"
+      "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
+    depends_on:
+      - redis
+      - kafka-1
+      - kafka-2
+      - kafka-3
   
+  storage-service-2:
+    image: storageservice
+    restart: always
+    build:
+      context: .
+      dockerfile: StorageService/Dockerfile
+    environment:
+      "Kafka:Producer:MessageCreatedEventsTopic": "MessageCreatedEvents"
+      "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Consumers:NewMessages:Topic": "NewMessages"
+      "Kafka:Consumers:NewMessages:Config:GroupId": "messaging_service_new_messages"
+      "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
+    depends_on:
+      - redis
+      - kafka-1
+      - kafka-2
+      - kafka-3
+  
+    
+  storage-service-3:
+    image: storageservice
+    restart: always
+    build:
+      context: .
+      dockerfile: StorageService/Dockerfile
+    environment:
+      "Kafka:Producer:MessageCreatedEventsTopic": "MessageCreatedEvents"
+      "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Consumers:NewMessages:Topic": "NewMessages"
+      "Kafka:Consumers:NewMessages:Config:GroupId": "messaging_service_new_messages"
+      "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
+    depends_on:
+      - redis
+      - kafka-1
+      - kafka-2
+      - kafka-3
