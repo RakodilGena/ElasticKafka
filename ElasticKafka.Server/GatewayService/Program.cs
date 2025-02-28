@@ -6,6 +6,14 @@ using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//validate whether services' lifetimes are valid and correspond to each other.
+builder.WebHost.UseDefaultServiceProvider(
+    (_, options) =>
+    {
+        options.ValidateScopes = true;
+        options.ValidateOnBuild = true;
+    });
+
 builder.Services.AddControllers();
 
 builder.Services
@@ -14,7 +22,6 @@ builder.Services
     .AddCustomSignalR(builder.Configuration)
     .AddSwagger()
     .AddCorsDefaultPolicy(builder.Configuration);
-
 
 var app = builder.Build();
 

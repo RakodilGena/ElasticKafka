@@ -121,7 +121,6 @@ async Task SendMessageAsync()
     //await Task.Yield();
 
     Console.WriteLine("Message sent successfully!");
-    Console.WriteLine();
 }
 
 static void ClearLine(){

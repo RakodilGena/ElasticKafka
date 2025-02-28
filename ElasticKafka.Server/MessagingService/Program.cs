@@ -4,6 +4,14 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//validate whether services' lifetimes are valid and correspond to each other.
+builder.WebHost.UseDefaultServiceProvider(
+    (_, options) =>
+    {
+        options.ValidateScopes = true;
+        options.ValidateOnBuild = true;
+    });
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ConfigureEndpointDefaults(x =>
