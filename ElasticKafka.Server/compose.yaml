@@ -1,14 +1,95 @@
 ﻿volumes:
   kafka-1-data:
   kafka-2-data:
-  kafka-3-data:
-
+  kafka-3-data:   
+  elastic-1-data:
+  elastic-2-data:
+  elastic-3-data:
+    
 services:
+  
+  #Important node: minimum THREE elastic nodes required for successful master-election-quorum
+  #if master dies somehow
+  elastic-1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.2 #latest doesn't work
+    container_name: elastic-1
+    ports:
+      - "9201:9200"
+    environment:
+      - bootstrap.memory_lock=true #prevents swapping memory to disk
+      - xpack.security.enabled=false #disabled for dev env
+
+      - node.name=elastic-1
+      - cluster.name=elastic-cluster-storage
+      
+      #other nodes
+      - discovery.seed_hosts=elastic-2,elastic-3
+      
+      #IMPORTANT: remove after cluster is formed
+      #- cluster.initial_master_nodes=elastic-1,elastic-2,elastic-3
+
+      #storage initial - max (512mb). inc for prod (eg -Xms2g -Xmx2g for 2 gb)
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Dlog4j2.formatMsgNoLookups=true"
+    volumes:
+      - elastic-1-data:/usr/share/elasticsearch/data
+    restart: "on-failure"
+
+  elastic-2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.2
+    container_name: elastic-2
+    ports:
+      - "9202:9200"
+    environment:
+      - bootstrap.memory_lock=true #prevents swapping memory to disk
+      - xpack.security.enabled=false #disabled for dev env
+
+      - node.name=elastic-2
+      - cluster.name=elastic-cluster-storage
+      
+      #other nodes
+      - discovery.seed_hosts=elastic-1,elastic-3
+      
+      #IMPORTANT: remove after cluster is formed
+      #- cluster.initial_master_nodes=elastic-1,elastic-2,elastic-3
+
+      #storage initial - max (512mb). inc for prod (eg -Xms2g -Xmx2g for 2 gb)
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Dlog4j2.formatMsgNoLookups=true"
+    volumes:
+      - elastic-2-data:/usr/share/elasticsearch/data
+    restart: "on-failure"
+    
+  elastic-3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.2
+    container_name: elastic-3
+    ports:
+      - "9203:9200"
+    environment:
+      - bootstrap.memory_lock=true #prevents swapping memory to disk
+      - xpack.security.enabled=false #disabled for dev env
+
+      - node.name=elastic-3
+      - cluster.name=elastic-cluster-storage
+
+      #other nodes
+      - discovery.seed_hosts=elastic-1,elastic-2
+
+      #IMPORTANT: remove after cluster is formed
+      #- cluster.initial_master_nodes=elastic-1,elastic-2,elastic-3
+
+      #storage initial - max (512mb). inc for prod (eg -Xms2g -Xmx2g for 2 gb)
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Dlog4j2.formatMsgNoLookups=true"
+    volumes:
+      - elastic-3-data:/usr/share/elasticsearch/data
+    restart: "on-failure"
+    
+    
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     restart: always
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+      
+    
 
   kafka-1:
     image: confluentinc/cp-kafka:latest
@@ -20,7 +101,8 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_BROKER_RACK: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-              
+      
+      #internal to access from docker cluster, local - to access from elsewhere (from localhost apps too)
       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INTERNAL
       KAFKA_LISTENERS: LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29091
       KAFKA_ADVERTISED_LISTENERS: LISTENER_INTERNAL://kafka-1:9091,LISTENER_LOCAL://localhost:29091
@@ -80,6 +162,7 @@ services:
       - zookeeper
         
         
+        
 #  automatically creates requested kafka topics
   init-topics:
     image: confluentinc/cp-kafka:latest
@@ -102,12 +185,14 @@ services:
       kafka-topics --bootstrap-server kafka-1:9091 --list
       "
       
+      
   redis:
     image: redis:latest
     container_name: redis
     ports:
       - "6379:6379"
     restart: always
+
   
   gateway-service-1:
     image: gatewayservice
@@ -173,8 +258,7 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
-        
-  
+          
   messaging-service-2:
     image: messagingservice
     restart: always
@@ -207,6 +291,7 @@ services:
       - kafka-3
   
       
+      
   storage-service-1:
     image: storageservice
     restart: always
@@ -225,7 +310,7 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
-  
+      
   storage-service-2:
     image: storageservice
     restart: always
