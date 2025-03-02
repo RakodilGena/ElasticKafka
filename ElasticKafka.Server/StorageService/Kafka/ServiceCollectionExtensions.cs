@@ -12,8 +12,14 @@ namespace StorageService.Kafka;
 
 internal static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddKafka(this IServiceCollection services)
+    public static IServiceCollection AddKafka(
+        this IServiceCollection services,
+        bool inMigratorMode)
     {
+        if (inMigratorMode)
+            return services;
+        
+        
         //consumers---------------------------------------
         services
             .AddOptions<NewMessagesConsumerConfig>()

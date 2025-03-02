@@ -310,6 +310,10 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
+      - elastic-1
+      - elastic-2
+      - elastic-3
+      - storage-service-migrator
       
   storage-service-2:
     image: storageservice
@@ -329,6 +333,10 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
+      - elastic-1
+      - elastic-2
+      - elastic-3
+      - storage-service-migrator
   
     
   storage-service-3:
@@ -349,3 +357,20 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
+      - elastic-1
+      - elastic-2
+      - elastic-3
+      - storage-service-migrator
+        
+  storage-service-migrator:
+    image: storageservice
+    build:
+      context: .
+      dockerfile: StorageService/Dockerfile
+    environment:
+      "MIGRATE": "true"
+      "Elastic:Nodes": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
+    depends_on:
+      - elastic-1
+      - elastic-2
+      - elastic-3
