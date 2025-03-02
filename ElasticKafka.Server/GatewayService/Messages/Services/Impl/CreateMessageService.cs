@@ -1,18 +1,19 @@
-﻿using GatewayService.NewMessages.Models;
+﻿using GatewayService.Messages.Models;
+using GatewayService.Messages.RemoteServiceDiscovery.Messages;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.Client;
 using MessagingService;
 
-namespace GatewayService.NewMessages.Services.Impl;
+namespace GatewayService.Messages.Services.Impl;
 
-internal sealed class MessageService : IMessageService
+internal sealed class CreateMessageService : ICreateMessageService
 {
-    private readonly ILogger<MessageService> _logger;
-    private readonly IMessageServiceUrlProvider _urlProvider;
+    private readonly ILogger<CreateMessageService> _logger;
+    private readonly IMessagingServiceUrlProvider _urlProvider;
 
-    public MessageService(
-        ILogger<MessageService> logger,
-        IMessageServiceUrlProvider urlProvider)
+    public CreateMessageService(
+        ILogger<CreateMessageService> logger,
+        IMessagingServiceUrlProvider urlProvider)
     {
         _logger = logger;
         _urlProvider = urlProvider;

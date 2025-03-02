@@ -1,4 +1,4 @@
-﻿namespace GatewayService.NewMessages.Models;
+﻿namespace GatewayService.Messages.Models;
 
 public sealed record SendMessageRequestDto(
     string MessageText,

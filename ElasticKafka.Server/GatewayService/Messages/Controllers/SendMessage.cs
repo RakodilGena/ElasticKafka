@@ -1,17 +1,17 @@
-﻿using GatewayService.NewMessages.Mapping;
-using GatewayService.NewMessages.Models;
-using GatewayService.NewMessages.Services;
-using GatewayService.NewMessages.Validation;
+﻿using GatewayService.Messages.Mapping;
+using GatewayService.Messages.Models;
+using GatewayService.Messages.Services;
+using GatewayService.Messages.Validation;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GatewayService.NewMessages.Controllers;
+namespace GatewayService.Messages.Controllers;
 
 public partial class MessageController
 {
     [HttpPost]
     public async Task<ActionResult> SendMessageAsync(
         [FromBody] SendMessageRequest request,
-        [FromServices] IMessageService service)
+        [FromServices] ICreateMessageService service)
     {
         request.Validate();
 

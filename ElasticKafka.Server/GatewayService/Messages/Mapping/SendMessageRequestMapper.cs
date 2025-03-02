@@ -1,6 +1,6 @@
-﻿using GatewayService.NewMessages.Models;
+﻿using GatewayService.Messages.Models;
 
-namespace GatewayService.NewMessages.Mapping;
+namespace GatewayService.Messages.Mapping;
 
 internal static class SendMessageRequestMapper
 {

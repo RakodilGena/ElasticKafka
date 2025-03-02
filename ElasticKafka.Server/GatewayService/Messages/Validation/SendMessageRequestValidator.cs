@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using GatewayService.NewMessages.Models;
+using GatewayService.Messages.Models;
 
-namespace GatewayService.NewMessages.Validation;
+namespace GatewayService.Messages.Validation;
 
 internal static class SendMessageRequestValidator
 {

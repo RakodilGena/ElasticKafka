@@ -204,7 +204,7 @@ services:
       - "5101:8080"
     environment:
       "MessageServicesUrls:Value": "http://messaging-service-1:8080,http://messaging-service-2:8080,http://messaging-service-3:8080"
-      
+      "StorageServicesUrls:Value": "http://storage-service-1:8080,http://storage-service-2:8080,http://storage-service-3:8080"
       "Redis:ConnectionString": "redis:6379"
       
       "Kafka:Consumers:MessageCreatedEvents:Topic": "MessageCreatedEvents"
@@ -229,6 +229,7 @@ services:
       - "5102:8080"
     environment:
       "MessageServicesUrls:Value": "http://messaging-service-1:8080,http://messaging-service-2:8080,http://messaging-service-3:8080"
+      "StorageServicesUrls:Value": "http://storage-service-1:8080,http://storage-service-2:8080,http://storage-service-3:8080"
 
       "Redis:ConnectionString": "redis:6379"
 

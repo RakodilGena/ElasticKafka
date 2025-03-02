@@ -1,7 +1,7 @@
 ﻿using GatewayService.ExceptionFilters;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GatewayService.NewMessages.Controllers;
+namespace GatewayService.Messages.Controllers;
 
 [Route("api/messages")]
 [GatewayExceptionFilter]

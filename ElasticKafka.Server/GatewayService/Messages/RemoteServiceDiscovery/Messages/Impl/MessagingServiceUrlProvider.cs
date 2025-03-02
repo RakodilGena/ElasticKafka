@@ -1,13 +1,12 @@
-﻿using GatewayService.NewMessages.Setup;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 
-namespace GatewayService.NewMessages.Services.Impl;
+namespace GatewayService.Messages.RemoteServiceDiscovery.Messages.Impl;
 
-internal sealed class MessageServiceUrlProvider : IMessageServiceUrlProvider
+internal sealed class MessagingServiceUrlProvider : IMessagingServiceUrlProvider
 {
     private readonly IOptionsSnapshot<MessageServicesUrls> _options;
 
-    public MessageServiceUrlProvider(
+    public MessagingServiceUrlProvider(
         IOptionsSnapshot<MessageServicesUrls> options)
     {
         _options = options;
@@ -25,6 +24,5 @@ internal sealed class MessageServiceUrlProvider : IMessageServiceUrlProvider
         var idx = Random.Shared.Next(0, urls.Length);
         
         return urls[idx];
-            
     }
 }

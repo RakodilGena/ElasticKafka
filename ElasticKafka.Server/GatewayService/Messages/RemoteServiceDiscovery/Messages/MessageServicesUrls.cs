@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GatewayService.NewMessages.Setup;
+namespace GatewayService.Messages.RemoteServiceDiscovery.Messages;
 
 public sealed class MessageServicesUrls
 {

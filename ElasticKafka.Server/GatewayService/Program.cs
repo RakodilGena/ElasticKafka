@@ -1,6 +1,7 @@
 using GatewayService.Extensions;
 using GatewayService.Kafka;
-using GatewayService.NewMessages.Services;
+using GatewayService.Messages.RemoteServiceDiscovery;
+using GatewayService.Messages.Services;
 using GatewayService.SignalR;
 using Microsoft.AspNetCore.HttpOverrides;
 
@@ -21,7 +22,8 @@ builder.Services
     .AddKafka()
     .AddCustomSignalR(builder.Configuration)
     .AddSwagger()
-    .AddCorsDefaultPolicy(builder.Configuration);
+    .AddCorsDefaultPolicy(builder.Configuration)
+    .AddServiceDiscovery();
 
 var app = builder.Build();
 
