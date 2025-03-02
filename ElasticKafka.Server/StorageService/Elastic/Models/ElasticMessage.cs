@@ -7,8 +7,8 @@
 /// <param name="MessageText">NGram Indexed</param>
 /// <param name="SentAt">Indexed</param>
 /// <param name="SavedAt">NOT Indexed</param>
-public sealed record MessageElastic(
-    long Id,
+public sealed record ElasticMessage(
+    Guid Id,
     string MessageText,
     DateTimeOffset SentAt,
     DateTimeOffset SavedAt);

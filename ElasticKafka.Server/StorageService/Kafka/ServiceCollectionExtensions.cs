@@ -45,7 +45,7 @@ internal static class ServiceCollectionExtensions
         
         services
             .AddSingleton<IProducerProvider, ProducerProvider>()
-            .AddScoped<IMessageCreatedEventProducer, MessageCreatedEventProducer>();
+            .AddSingleton<IMessageCreatedEventProducer, MessageCreatedEventProducer>();
         
         return services;
     }

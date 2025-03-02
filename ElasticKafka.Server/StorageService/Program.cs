@@ -1,5 +1,6 @@
 using StorageService.Elastic;
 using StorageService.Kafka;
+using StorageService.Messages.Services;
 using StorageService.Migration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +17,8 @@ builder.WebHost.UseDefaultServiceProvider(
 
 builder.Services
     .AddKafka(inMigratorMode)
-    .AddElastic(builder.Configuration);
+    .AddElastic(builder.Configuration)
+    .AddMessageServices();
 
 var app = builder.Build();
 

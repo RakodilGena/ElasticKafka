@@ -1,4 +1,4 @@
-﻿namespace GatewayService.Messages.Services;
+﻿namespace StorageService.Messages.Services;
 
 public interface IDeleteMessageService
 {

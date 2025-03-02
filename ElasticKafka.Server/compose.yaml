@@ -306,6 +306,7 @@ services:
       "Kafka:Consumers:NewMessages:Config:GroupId": "messaging_service_new_messages"
       "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
       "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
+      "Elastic:Nodes": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
     depends_on:
       - redis
       - kafka-1
@@ -329,6 +330,7 @@ services:
       "Kafka:Consumers:NewMessages:Config:GroupId": "messaging_service_new_messages"
       "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
       "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
+      "Elastic:Nodes": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
     depends_on:
       - redis
       - kafka-1
@@ -352,7 +354,8 @@ services:
       "Kafka:Consumers:NewMessages:Topic": "NewMessages"
       "Kafka:Consumers:NewMessages:Config:GroupId": "messaging_service_new_messages"
       "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
-      "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
+      "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false" 
+      "Elastic:Nodes": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
     depends_on:
       - redis
       - kafka-1
@@ -365,6 +368,7 @@ services:
         
   storage-service-migrator:
     image: storageservice
+    restart: on-failure #will actually restart until elastic reached and index created / exists checked
     build:
       context: .
       dockerfile: StorageService/Dockerfile

@@ -2,6 +2,10 @@
 
 internal static class GatewayUrls
 {
+    //local
+    //private const string Urls = "http://localhost:5100";
+    
+    //docker cluster
     private const string Urls = "http://localhost:5101,http://localhost:5102";
 
     public static string Get()

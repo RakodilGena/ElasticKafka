@@ -22,6 +22,9 @@ public sealed class ElasticMigrator
         if (existsResponse.Exists)
         {
             logger.LogInformation("Index \"{idx}\" already exists, skipping.", messagesIndex);
+            
+            //await client.Indices.DeleteAsync(messagesIndex);
+            
             return;
         }
 
@@ -57,11 +60,14 @@ public sealed class ElasticMigrator
                 )
             )
             .Mappings(m => m
-                .Properties<MessageElastic>(props =>
-                    props.Text(
+                .Properties<ElasticMessage>(props =>
+                    props
+                        .Keyword(t => t.Id)
+                        .Text(
                             t => t.MessageText,
                             t => t.Analyzer("ngram_3_7_analyzer"))
-                        .Text(
+                        .Date(t => t.SentAt)
+                        .Date(
                             t => t.SavedAt,
                             t => t.Store().Index(false))
                 )

@@ -6,26 +6,32 @@ using StorageService.Kafka.Consumers.NewMessages.Config;
 using StorageService.Kafka.Consumers.NewMessages.Models;
 using StorageService.Kafka.Consumers.NewMessages.Validation;
 using StorageService.Kafka.Producers.MessageCreatedEvents;
+using StorageService.Messages.Services;
 
 namespace StorageService.Kafka.Consumers.NewMessages;
 
 internal sealed class NewMessagesConsumer : BackgroundService
 {
-    private readonly IServiceScopeFactory _serviceScopeFactory;
-    private readonly ILogger<NewMessagesConsumer> _logger;
     private readonly IConsumerProvider _consumerProvider;
     private readonly IOptions<NewMessagesConsumerConfig> _config;
+    
+    private readonly ICreateMessageService _createMessageService;
+    private readonly IMessageCreatedEventProducer _messageCreatedEventProducer;
+    
+    private readonly ILogger<NewMessagesConsumer> _logger;
 
     public NewMessagesConsumer(
-        IServiceScopeFactory serviceScopeFactory,
-        ILogger<NewMessagesConsumer> logger,
-        IConsumerProvider consumerProvider,
-        IOptions<NewMessagesConsumerConfig> config)
+        IConsumerProvider consumerProvider, 
+        IOptions<NewMessagesConsumerConfig> config, 
+        ICreateMessageService createMessageService, 
+        IMessageCreatedEventProducer messageCreatedEventProducer,
+        ILogger<NewMessagesConsumer> logger)
     {
-        _serviceScopeFactory = serviceScopeFactory;
-        _logger = logger;
         _consumerProvider = consumerProvider;
         _config = config;
+        _createMessageService = createMessageService;
+        _messageCreatedEventProducer = messageCreatedEventProducer;
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -102,10 +108,7 @@ internal sealed class NewMessagesConsumer : BackgroundService
 
         _logger.LogInformation("Received NewMessage with ID: [{messageID}]", kafkaNewMessage.Id);
 
-        using var serviceScope = _serviceScopeFactory.CreateScope();
-
         bool saved = await TrySaveMessageAsync(
-            serviceScope,
             kafkaNewMessage,
             ct);
 
@@ -113,40 +116,31 @@ internal sealed class NewMessagesConsumer : BackgroundService
             return;
 
         await ProduceConfirmationAsync(
-            serviceScope,
             kafkaNewMessage,
             ct);
     }
 
-    private Task<bool> TrySaveMessageAsync(
-        IServiceScope scope,
+    private async Task<bool> TrySaveMessageAsync(
         KafkaNewMessage kafkaNewMessage,
         CancellationToken ct)
     {
-        //todo: save to elastic
-
-        _logger.LogInformation("NewMessagesConsumer saved message {message}", kafkaNewMessage);
-
-        return Task.FromResult(true);
-        // var createMessageService = scope.ServiceProvider.GetRequiredService<ICreateMessageService>();
-        // var newMessage = kafkaNewMessage.ToDto();
-        //
-        // return await createMessageService.TryCreateMessage(newMessage, ct);
+        //dont try catch ex cz if message failed to create due to elastic fault,
+        //it's important not to commit Kafka message.
+        return await _createMessageService.TryCreateMessageAsync(kafkaNewMessage, ct);
     }
 
     private async Task ProduceConfirmationAsync(
-        IServiceScope scope,
         KafkaNewMessage newMessage,
         CancellationToken ct)
     {
         try
         {
-            var producer = scope.ServiceProvider.GetRequiredService<IMessageCreatedEventProducer>();
-
-            await producer.ProduceAsync(newMessage.Id, ct);
+            await _messageCreatedEventProducer.ProduceAsync(newMessage.Id, ct);
         }
         catch (Exception e)
         {
+            //because it's unnecessary to fail consumer completely
+            //if confirmation produce failed
             _logger.LogError(e, "Failed to produce new message confirmation");
         }
     }
