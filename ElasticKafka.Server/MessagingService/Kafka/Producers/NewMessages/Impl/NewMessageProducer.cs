@@ -23,9 +23,11 @@ internal sealed class NewMessageProducer : INewMessageProducer
         _logger = logger;
     }
 
-    public async Task ProduceAsync(SendMessageRequestDto request)
+    public async Task ProduceAsync(
+        SendMessageRequestDto request,
+        CancellationToken ct)
     {
-        var messageId = request.MessageId.ToString();
+        var messageId = request.MessageId;
 
         _logger.LogInformation(
             "Producing new message [{messageId}] to kafka",
@@ -33,18 +35,22 @@ internal sealed class NewMessageProducer : INewMessageProducer
 
         var producer = _producerProvider.Get();
 
-        var kafkaMessage = ToKafka(messageId, request.MessageText);
-
-        await producer.ProduceAsync(_config.Value.NewMessagesTopic, kafkaMessage);
-
-        _logger.LogInformation("New message [{messageId}] produced successfully", messageId);
+        var kafkaMessage = ToKafka(request);
+        
+        await ProduceMessageWithRetryAsync(producer, kafkaMessage, ct);
+        
+        _logger.LogInformation(
+            "New message [{messageId}] produced successfully", 
+            messageId);
     }
 
     private static Message<string, string> ToKafka(
-        string messageId,
-        string messageText)
+        SendMessageRequestDto request)
     {
-        var kafkaOrder = new KafkaNewMessage(messageId, messageText);
+        var kafkaOrder = new KafkaNewMessage(
+            request.MessageId,
+            request.MessageText,
+            request.SentAt);
 
         var value = JsonSerializer.Serialize(
             kafkaOrder,
@@ -53,13 +59,55 @@ internal sealed class NewMessageProducer : INewMessageProducer
         //key is there to determine the partition (hash -> partition)
         return new Message<string, string>
         {
-            Key = messageId,
+            Key = request.MessageId.ToString(),
             Value = value
         };
     }
 
+    private async Task ProduceMessageWithRetryAsync(
+        IProducer<string, string> producer,
+        Message<string, string> message,
+        CancellationToken ct)
+    {
+        var currentAttempt = 0;
+        const int maxAttempts = 3;
+
+        while (true)
+        {
+            currentAttempt++;
+            try
+            {
+                await producer.ProduceAsync(
+                    _config.Value.NewMessagesTopic, 
+                    message, 
+                    ct);
+                
+                return;
+            }
+            catch (Exception e)
+            {
+                if (currentAttempt < maxAttempts)
+                {
+                    _logger.LogError(e,
+                        "Failed to produce message to kafka, attempt: {curAtt}. Retrying...",
+                        currentAttempt);
+
+                    continue;
+                }
+
+                _logger.LogError(e,
+                    "Failed to produce message to kafka, total attempts: {curAtt}",
+                    currentAttempt);
+
+                throw new Exception(
+                    $"Failed to produce message to kafka, total attempts: {currentAttempt}");
+            }
+        }
+    }
+
     [UsedImplicitly]
     private sealed record KafkaNewMessage(
-        string Id,
-        string Text);
+        Guid Id,
+        string Text,
+        DateTimeOffset SentAt);
 }

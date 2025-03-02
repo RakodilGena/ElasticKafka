@@ -32,7 +32,7 @@ services:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Dlog4j2.formatMsgNoLookups=true"
     volumes:
       - elastic-1-data:/usr/share/elasticsearch/data
-    restart: "on-failure"
+    restart: on-failure
 
   elastic-2:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.2
@@ -56,7 +56,7 @@ services:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Dlog4j2.formatMsgNoLookups=true"
     volumes:
       - elastic-2-data:/usr/share/elasticsearch/data
-    restart: "on-failure"
+    restart: on-failure
     
   elastic-3:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.2
@@ -80,12 +80,12 @@ services:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Dlog4j2.formatMsgNoLookups=true"
     volumes:
       - elastic-3-data:/usr/share/elasticsearch/data
-    restart: "on-failure"
+    restart: on-failure
     
     
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
-    restart: always
+    restart: on-failure
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       
@@ -93,7 +93,7 @@ services:
 
   kafka-1:
     image: confluentinc/cp-kafka:latest
-    restart: always
+    restart: on-failure
     ports:
       - '9091:9091'
       - '29091:29091'
@@ -117,7 +117,7 @@ services:
 
   kafka-2:
     image: confluentinc/cp-kafka:latest
-    restart: always
+    restart: on-failure
     ports:
       - "9092:9092"
       - '29092:29092'
@@ -140,7 +140,7 @@ services:
 
   kafka-3:
     image: confluentinc/cp-kafka:latest
-    restart: always
+    restart: on-failure
     ports:
       - "9093:9093"
       - '29093:29093'
@@ -191,12 +191,12 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
-    restart: always
+    restart: on-failure
 
   
   gateway-service-1:
     image: gatewayservice
-    restart: always
+    restart: on-failure
     build:
       context: .
       dockerfile: GatewayService/Dockerfile
@@ -221,7 +221,7 @@ services:
       
   gateway-service-2:
     image: gatewayservice
-    restart: always
+    restart: on-failure
     build:
       context: .
       dockerfile: GatewayService/Dockerfile
@@ -246,30 +246,30 @@ services:
   
   messaging-service-1:
     image: messagingservice
-    restart: always
+    restart: on-failure
     build:
       context: .
       dockerfile: MessagingService/Dockerfile
     environment:
       "Kafka:Producer:NewMessagesTopic": "NewMessages"
       "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Producer:Config:MessageTimeoutMs": "10000"
     depends_on:
-      - redis
       - kafka-1
       - kafka-2
       - kafka-3
           
   messaging-service-2:
     image: messagingservice
-    restart: always
+    restart: on-failure
     build:
       context: .
       dockerfile: MessagingService/Dockerfile
     environment:
       "Kafka:Producer:NewMessagesTopic": "NewMessages"
       "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Producer:Config:MessageTimeoutMs": "10000"
     depends_on:
-      - redis
       - kafka-1
       - kafka-2
       - kafka-3
@@ -277,15 +277,15 @@ services:
     
   messaging-service-3:
     image: messagingservice
-    restart: always
+    restart: on-failure
     build:
       context: .
       dockerfile: MessagingService/Dockerfile
     environment:
       "Kafka:Producer:NewMessagesTopic": "NewMessages"
       "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Producer:Config:MessageTimeoutMs": "10000"
     depends_on:
-      - redis
       - kafka-1
       - kafka-2
       - kafka-3
@@ -294,7 +294,7 @@ services:
       
   storage-service-1:
     image: storageservice
-    restart: always
+    restart: on-failure
     build:
       context: .
       dockerfile: StorageService/Dockerfile
@@ -317,7 +317,7 @@ services:
       
   storage-service-2:
     image: storageservice
-    restart: always
+    restart: on-failure
     build:
       context: .
       dockerfile: StorageService/Dockerfile
@@ -341,7 +341,7 @@ services:
     
   storage-service-3:
     image: storageservice
-    restart: always
+    restart: on-failure
     build:
       context: .
       dockerfile: StorageService/Dockerfile

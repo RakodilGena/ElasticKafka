@@ -20,7 +20,7 @@ internal sealed class MessageCreatedEventProducer : IMessageCreatedEventProducer
         _logger = logger;
     }
 
-    public async Task ProduceAsync(Guid messageId)
+    public async Task ProduceAsync(Guid messageId, CancellationToken ct = default)
     {
         _logger.LogInformation(
             "Producing message created event [Message ID:{messageId}] to kafka",
@@ -30,10 +30,11 @@ internal sealed class MessageCreatedEventProducer : IMessageCreatedEventProducer
 
         var kafkaMessage = ToKafka(messageId);
 
-        await producer.ProduceAsync(_config.Value.MessageCreatedEventsTopic, kafkaMessage);
+        await ProduceMessageWithRetryAsync(producer, kafkaMessage, ct);
 
         _logger.LogInformation(
-            "Message created event [Message ID:{messageId}] produced successfully", messageId);
+            "Message created event [Message ID:{messageId}] produced successfully", 
+            messageId);
     }
 
     private static Message<string, string> ToKafka(
@@ -47,5 +48,45 @@ internal sealed class MessageCreatedEventProducer : IMessageCreatedEventProducer
             Key = idString,
             Value = idString
         };
+    }
+    
+    private async Task ProduceMessageWithRetryAsync(
+        IProducer<string, string> producer,
+        Message<string, string> message,
+        CancellationToken ct)
+    {
+        var currentAttempt = 0;
+        const int maxAttempts = 3;
+
+        while (true)
+        {
+            currentAttempt++;
+            try
+            {
+                await producer.ProduceAsync(
+                    _config.Value.MessageCreatedEventsTopic, 
+                    message,
+                    ct);
+                
+                return;
+            }
+            catch (Exception e)
+            {
+                if (currentAttempt < maxAttempts)
+                {
+                    _logger.LogError(e,
+                        "Failed to produce message to kafka, attempt: {curAtt}. Retrying...",
+                        currentAttempt);
+
+                    continue;
+                }
+
+                _logger.LogError(e,
+                    "Failed to produce message to kafka, total attempts: {curAtt}",
+                    currentAttempt);
+
+                throw;
+            }
+        }
     }
 }

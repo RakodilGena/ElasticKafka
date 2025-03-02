@@ -1,5 +1,3 @@
-using Elastic.Clients.Elasticsearch;
-using Elastic.Transport;
 using StorageService.Elastic;
 using StorageService.Kafka;
 using StorageService.Migration;

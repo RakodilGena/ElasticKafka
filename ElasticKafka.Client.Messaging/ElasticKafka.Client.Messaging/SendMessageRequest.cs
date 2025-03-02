@@ -1,3 +1,5 @@
 ﻿namespace ElasticKafka.Client.Messaging;
 
-internal sealed record SendMessageRequest(string MessageText);
+internal sealed record SendMessageRequest(
+    string? MessageText,
+    DateTimeOffset? SentAt);

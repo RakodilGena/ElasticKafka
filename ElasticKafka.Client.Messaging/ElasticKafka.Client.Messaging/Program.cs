@@ -97,30 +97,48 @@ async Task<bool> TryEstablishSignalRConnectionAsync()
 
 async Task SendMessageAsync()
 {
-    if (input.Length is 0)
+    try
     {
-        Console.WriteLine("Your message is empty and won't be sent.");
-        return;
+        if (input.Length is 0)
+        {
+            Console.WriteLine("Your message is empty and won't be sent.");
+            return;
+        }
+    
+        var message = input.ToString();
+        input.Clear();
+    
+        var baseUrl = GatewayUrls.Get();
+        var url = new Uri($"{baseUrl}/api/messages");
+
+        Console.WriteLine($"Sending message [{message}], url: {url}");
+
+        var request = new SendMessageRequest(
+            message,
+            SentAt: DateTimeOffset.UtcNow);
+    
+        var httpClientFactory = GlobalServiceProvider.GetService<IHttpClientFactory>();
+
+        var client = httpClientFactory.CreateClient();
+        //client.Timeout = TimeSpan.FromSeconds(10);
+    
+        var resp = await client.PostAsJsonAsync(url, request);
+        //await Task.Yield();
+
+        if (resp.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Message sent successfully!");
+        }
+        else
+        {
+            Console.WriteLine($"Error sending message: {resp.StatusCode}{resp.Content.ReadAsStringAsync().Result}");
+        }
+        
     }
-    
-    var message = input.ToString();
-    input.Clear();
-    
-    var baseUrl = GatewayUrls.Get();
-    var url = new Uri($"{baseUrl}/api/messages");
-
-    Console.WriteLine($"Sending message [{message}], url: {url}");
-
-    var request = new SendMessageRequest(message);
-    
-    var httpClientFactory = GlobalServiceProvider.GetService<IHttpClientFactory>();
-
-    var client = httpClientFactory.CreateClient();
-    
-    await client.PostAsJsonAsync(url, request);
-    //await Task.Yield();
-
-    Console.WriteLine("Message sent successfully!");
+    catch (Exception e)
+    {
+        Console.WriteLine($"Error sending message: {Environment.NewLine}{e}");
+    }
 }
 
 static void ClearLine(){

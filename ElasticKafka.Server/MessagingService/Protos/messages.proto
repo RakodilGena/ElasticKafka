@@ -3,6 +3,7 @@ syntax = "proto3";
 option csharp_namespace = "MessagingService";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 package MessageRpc;
 
@@ -12,4 +13,6 @@ service MessageServiceRpc {
 
 message SendMessageRequestRpc {
   string messageText = 1;
+  google.protobuf.Timestamp sentAt = 2;
+  string messageId = 3;
 }

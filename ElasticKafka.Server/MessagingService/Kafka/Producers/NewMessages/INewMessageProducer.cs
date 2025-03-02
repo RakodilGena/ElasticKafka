@@ -4,5 +4,7 @@ namespace MessagingService.Kafka.Producers.NewMessages;
 
 public interface INewMessageProducer
 {
-    Task ProduceAsync(SendMessageRequestDto request);
+    Task ProduceAsync(
+        SendMessageRequestDto request,
+        CancellationToken ct);
 }

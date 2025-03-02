@@ -31,7 +31,7 @@ internal sealed class NewMessagesConsumer : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await Task.Yield();
-        
+
         while (stoppingToken.IsCancellationRequested is false)
         {
             using var consumer = _consumerProvider.Create(_config.Value.Config);
@@ -108,11 +108,14 @@ internal sealed class NewMessagesConsumer : BackgroundService
             serviceScope,
             kafkaNewMessage,
             ct);
-        
+
         if (saved is false)
             return;
 
-        await ProduceConfirmationAsync(serviceScope, kafkaNewMessage);
+        await ProduceConfirmationAsync(
+            serviceScope,
+            kafkaNewMessage,
+            ct);
     }
 
     private Task<bool> TrySaveMessageAsync(
@@ -121,7 +124,7 @@ internal sealed class NewMessagesConsumer : BackgroundService
         CancellationToken ct)
     {
         //todo: save to elastic
-        
+
         _logger.LogInformation("NewMessagesConsumer saved message {message}", kafkaNewMessage);
 
         return Task.FromResult(true);
@@ -131,14 +134,20 @@ internal sealed class NewMessagesConsumer : BackgroundService
         // return await createMessageService.TryCreateMessage(newMessage, ct);
     }
 
-    private static async Task ProduceConfirmationAsync(
+    private async Task ProduceConfirmationAsync(
         IServiceScope scope,
-        KafkaNewMessage newMessage)
+        KafkaNewMessage newMessage,
+        CancellationToken ct)
     {
-        var producer = scope.ServiceProvider.GetRequiredService<IMessageCreatedEventProducer>();
-        
-        var guid = Guid.Parse(newMessage.Id);
-        
-        await producer.ProduceAsync(guid);
+        try
+        {
+            var producer = scope.ServiceProvider.GetRequiredService<IMessageCreatedEventProducer>();
+
+            await producer.ProduceAsync(newMessage.Id, ct);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to produce new message confirmation");
+        }
     }
 }

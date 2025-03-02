@@ -4,5 +4,5 @@ namespace GatewayService.NewMessages.Services;
 
 public interface IMessageService
 {
-    Task SendMessageAsync(SendMessageRequest request);
+    Task SendMessageAsync(SendMessageRequestDto request);
 }

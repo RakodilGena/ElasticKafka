@@ -1,4 +1,5 @@
 ﻿namespace GatewayService.NewMessages.Models;
 
 public sealed record SendMessageRequest(
-    string MessageText);
+    string? MessageText,
+    DateTimeOffset? SentAt);

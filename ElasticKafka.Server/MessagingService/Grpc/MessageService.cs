@@ -11,7 +11,7 @@ public sealed class MessageService : MessageServiceRpc.MessageServiceRpcBase
     private readonly INewMessageProducer _newMessageProducer;
 
     public MessageService(
-        ILogger<MessageService> logger, 
+        ILogger<MessageService> logger,
         INewMessageProducer newMessageProducer)
     {
         _logger = logger;
@@ -19,19 +19,49 @@ public sealed class MessageService : MessageServiceRpc.MessageServiceRpcBase
     }
 
     public override async Task<Empty> SendMessage(
-        SendMessageRequestRpc request, 
+        SendMessageRequestRpc request,
         ServerCallContext context)
     {
-        var messageId = Guid.CreateVersion7();
-        
-        _logger.LogInformation("Sending message {MessageId}", messageId);
-        
-        var requestDto = new SendMessageRequestDto(
-            messageId,
-            request.MessageText);
-        
-        await _newMessageProducer.ProduceAsync(requestDto);
-        
-        return new Empty();
+        try
+        {
+            request.Validate();
+
+            var messageId = request.MessageId;
+
+            _logger.LogInformation("Sending message {MessageId}", messageId);
+
+            var requestDto = new SendMessageRequestDto(
+                Guid.Parse(messageId),
+                request.MessageText,
+                request.SentAt.ToDateTimeOffset());
+
+            await _newMessageProducer.ProduceAsync(
+                requestDto,
+                context.CancellationToken);
+
+            return new Empty();
+        }
+        //todo: move to interceptor?
+        catch (OperationCanceledException exception)
+        {
+            _logger.LogError(exception, "Operation cancelled");
+
+            throw new RpcException(
+                new Status(
+                    StatusCode.Cancelled,
+                    "Operation cancelled",
+                    exception));
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception,
+                "Failed to send message {MessageId}",
+                request.MessageId);
+
+            throw new RpcException(
+                new Status(
+                    StatusCode.Aborted,
+                    "MessagingService failed to send message"));
+        }
     }
 }

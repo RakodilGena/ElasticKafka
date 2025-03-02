@@ -1,6 +1,5 @@
-﻿namespace MessagingService.Models;
+﻿namespace GatewayService.NewMessages.Models;
 
 public sealed record SendMessageRequestDto(
-    Guid MessageId,
     string MessageText,
     DateTimeOffset SentAt);

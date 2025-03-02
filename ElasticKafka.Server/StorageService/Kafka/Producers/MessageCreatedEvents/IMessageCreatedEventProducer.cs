@@ -2,5 +2,5 @@
 
 public interface IMessageCreatedEventProducer
 {
-    Task ProduceAsync(Guid messageId);
+    Task ProduceAsync(Guid messageId, CancellationToken ct = default);
 }
