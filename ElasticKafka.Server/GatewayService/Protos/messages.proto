@@ -5,9 +5,9 @@ option csharp_namespace = "MessagingService";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
-package MessageRpc;
+package MessagingRpc;
 
-service MessageServiceRpc {
+service MessagingServiceRpc {
   rpc SendMessage (SendMessageRequestRpc) returns (google.protobuf.Empty);
 }
 
@@ -16,3 +16,6 @@ message SendMessageRequestRpc {
   google.protobuf.Timestamp sentAt = 2;
   string messageId = 3;
 }
+
+
+

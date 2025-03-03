@@ -7,6 +7,9 @@ internal static class ServiceCollectionExtensions
     public static IServiceCollection AddMessageServices(this IServiceCollection services)
     {
         return services
-            .AddScoped<ICreateMessageService, CreateMessageService>();
+            .AddScoped<ICreateMessageService, CreateMessageService>()
+            .AddScoped<IGetMessagesService, GetMessagesService>()
+            .AddScoped<ISearchMessagesService, SearchMessagesService>()
+            .AddScoped<IDeleteMessageService, DeleteMessageService>();
     }
 }

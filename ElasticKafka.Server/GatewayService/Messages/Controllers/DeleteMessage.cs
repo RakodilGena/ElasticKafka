@@ -9,17 +9,17 @@ namespace GatewayService.Messages.Controllers;
 
 public partial class MessageController
 {
-    [HttpPost]
-    public async Task<ActionResult> SendMessageAsync(
-        [FromBody] SendMessageRequest request,
-        [FromServices] ICreateMessageService service)
+    [HttpDelete]
+    public async Task<ActionResult> DeleteMessageAsync(
+        [FromBody] DeleteMessageRequest request,
+        [FromServices] IDeleteMessageService service)
     {
-        var validator = new SendMessageRequestValidator();
+        var validator = new DeleteMessageRequestValidator();
         await validator.ValidateAndThrowAsync(request);
 
         var requestDto = request.ToDto();
         
-        await service.SendMessageAsync(requestDto);
+        await service.DeleteMessageAsync(requestDto);
         
         return Ok();
     }

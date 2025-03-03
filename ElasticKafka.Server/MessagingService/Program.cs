@@ -12,6 +12,7 @@ builder.WebHost.UseDefaultServiceProvider(
         options.ValidateOnBuild = true;
     });
 
+//for grpc only
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ConfigureEndpointDefaults(x =>

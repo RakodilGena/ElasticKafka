@@ -4,7 +4,7 @@ internal static class WebAppExtensions
 {
     public static WebApplication MapGrpcServices(this WebApplication app)
     {
-        app.MapGrpcService<MessageService>();
+        app.MapGrpcService<MessagingService>();
 
         return app;
     }

@@ -1,4 +1,4 @@
-﻿using GatewayService.Messages.Models;
+﻿using GatewayService.Messages.Models.Requests;
 
 namespace GatewayService.Messages.Services;
 

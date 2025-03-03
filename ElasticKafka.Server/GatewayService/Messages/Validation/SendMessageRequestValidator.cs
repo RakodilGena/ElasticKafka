@@ -1,16 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations;
-using GatewayService.Messages.Models;
+﻿using FluentValidation;
+using GatewayService.Messages.Models.Requests;
 
 namespace GatewayService.Messages.Validation;
 
-internal static class SendMessageRequestValidator
+internal sealed class SendMessageRequestValidator : AbstractValidator<SendMessageRequest?>
 {
-    public static void Validate(this SendMessageRequest request)
+    public SendMessageRequestValidator()
     {
-        if (string.IsNullOrEmpty(request.MessageText))
-            throw new ValidationException("Empty message text.");
-        
-        if (request.SentAt is null)
-            throw new ValidationException("Empty 'SentAt' timestamp.");
+        RuleFor(x => x)
+            .NotNull()
+            .WithMessage("invalid or null request")
+            
+            .DependentRules(() =>
+            {
+                RuleFor(x => x!.MessageText)
+                    .NotEmpty()
+                    .WithMessage("empty message text");
+
+                RuleFor(x => x!.SentAt)
+                    .NotNull()
+                    .NotEqual(new DateTimeOffset())
+                    .WithMessage("empty 'SentAt' timestamp");
+            });
     }
 }

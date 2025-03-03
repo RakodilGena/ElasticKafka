@@ -5,13 +5,13 @@ using MessagingService.Models;
 
 namespace MessagingService.Grpc;
 
-public sealed class MessageService : MessageServiceRpc.MessageServiceRpcBase
+public sealed class MessagingService : MessagingServiceRpc.MessagingServiceRpcBase
 {
-    private readonly ILogger<MessageService> _logger;
+    private readonly ILogger<MessagingService> _logger;
     private readonly INewMessageProducer _newMessageProducer;
 
-    public MessageService(
-        ILogger<MessageService> logger,
+    public MessagingService(
+        ILogger<MessagingService> logger,
         INewMessageProducer newMessageProducer)
     {
         _logger = logger;

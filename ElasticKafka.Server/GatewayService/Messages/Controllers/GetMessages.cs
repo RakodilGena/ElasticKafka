@@ -9,17 +9,18 @@ namespace GatewayService.Messages.Controllers;
 
 public partial class MessageController
 {
-    [HttpPost]
-    public async Task<ActionResult> SendMessageAsync(
-        [FromBody] SendMessageRequest request,
-        [FromServices] ICreateMessageService service)
+    [HttpGet]
+    public async Task<ActionResult> GetMessagesAsync(
+        GetMessagesRequest request,
+        [FromServices] IGetMessagesService service,
+        CancellationToken cancellationToken)
     {
-        var validator = new SendMessageRequestValidator();
-        await validator.ValidateAndThrowAsync(request);
+        var validator = new GetMessagesRequestValidator();
+        await validator.ValidateAndThrowAsync(request, cancellationToken);
 
         var requestDto = request.ToDto();
         
-        await service.SendMessageAsync(requestDto);
+        await service.GetMessagesAsync(requestDto, cancellationToken);
         
         return Ok();
     }

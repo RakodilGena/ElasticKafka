@@ -1,4 +1,4 @@
-﻿using GatewayService.Messages.Models;
+﻿using GatewayService.Messages.Models.Requests;
 using GatewayService.Messages.RemoteServiceDiscovery.Messages;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.Client;
@@ -60,7 +60,7 @@ internal sealed class CreateMessageService : ICreateMessageService
         _logger.LogInformation("Sending message to Messaging Service, {url}", url);
 
         using var channel = GrpcChannel.ForAddress(url);
-        var client = new MessageServiceRpc.MessageServiceRpcClient(channel);
+        var client = new MessagingServiceRpc.MessagingServiceRpcClient(channel);
 
         var rpcRequest = BuildRequest(request);
 

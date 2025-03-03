@@ -24,9 +24,9 @@ public sealed class GatewayExceptionFilter : ExceptionFilterAttribute
 
     private static string GetExMessage(Exception ex)
     {
-        if (ex is not RpcException rpcEx)
-            return ex.Message;
+        if (ex is RpcException rpcEx)
+            return rpcEx.Status.Detail;
 
-        return rpcEx.Status.Detail;
+        return ex.Message;
     }
 }
