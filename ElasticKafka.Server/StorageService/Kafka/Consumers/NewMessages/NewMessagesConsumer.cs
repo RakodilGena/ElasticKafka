@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Confluent.Kafka;
+using FluentValidation;
 using Microsoft.Extensions.Options;
 using StorageService.Kafka.Consumers.NewMessages.Config;
 using StorageService.Kafka.Consumers.NewMessages.Models;
 using StorageService.Kafka.Consumers.NewMessages.Validation;
 using StorageService.Kafka.Producers.MessageCreatedEvents;
+using StorageService.Messages.Models.Requests;
 using StorageService.Messages.Services;
 
 namespace StorageService.Kafka.Consumers.NewMessages;
@@ -19,6 +20,8 @@ internal sealed class NewMessagesConsumer : BackgroundService
     private readonly IMessageCreatedEventProducer _messageCreatedEventProducer;
     
     private readonly ILogger<NewMessagesConsumer> _logger;
+
+    private readonly KafkaNewMessageValidator _kafkaNewMessageValidator = new();
 
     public NewMessagesConsumer(
         IConsumerProvider consumerProvider, 
@@ -98,7 +101,9 @@ internal sealed class NewMessagesConsumer : BackgroundService
 
         try
         {
-            kafkaNewMessage.Validate();
+            await _kafkaNewMessageValidator.ValidateAndThrowAsync(
+                kafkaNewMessage,
+                ct);
         }
         catch (ValidationException e)
         {
@@ -121,12 +126,18 @@ internal sealed class NewMessagesConsumer : BackgroundService
     }
 
     private async Task<bool> TrySaveMessageAsync(
-        KafkaNewMessage kafkaNewMessage,
+        KafkaNewMessage message,
         CancellationToken ct)
     {
         //dont try catch ex cz if message failed to create due to elastic fault,
         //it's important not to commit Kafka message.
-        return await _createMessageService.TryCreateMessageAsync(kafkaNewMessage, ct);
+
+        var request = new CreateMessageRequestDto(
+            message.Id,
+            message.Text,
+            message.SentAt);
+        
+        return await _createMessageService.TryCreateMessageAsync(request, ct);
     }
 
     private async Task ProduceConfirmationAsync(

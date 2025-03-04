@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MessagingService.Grpc;
+namespace MessagingService.Grpc.Validation;
 
 internal static class SendMessageRequestRpcValidator
 {

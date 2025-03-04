@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using StorageService.Elastic;
+using StorageService.Grpc;
 using StorageService.Kafka;
 using StorageService.Messages.Services;
 using StorageService.Migration;
@@ -38,7 +39,7 @@ if (inMigratorMode)
     return;
 }
 
-//app.MapGrpcServices();
+app.MapGrpcServices();
 app.MapGet("/",
     () =>
         "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");

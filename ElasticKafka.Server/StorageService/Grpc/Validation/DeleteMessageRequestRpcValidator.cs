@@ -1,22 +1,21 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
-using GatewayService.Messages.Models.Requests;
+using MessagingService;
 
-namespace GatewayService.Messages.Validation;
+namespace StorageService.Grpc.Validation;
 
-internal sealed class DeleteMessageRequestValidator : AbstractValidator<DeleteMessageRequest>
+internal sealed class DeleteMessageRequestRpcValidator : AbstractValidator<DeleteMessageRequestRpc>
 {
-    public DeleteMessageRequestValidator()
+    public DeleteMessageRequestRpcValidator()
     {
-        RuleFor(x => x!.MessageId)
-            .NotNull()
+        RuleFor(x => x.MessageId)
             .NotEmpty()
-            .NotEqual(Guid.Empty)
+            .Must(x => Guid.TryParse(x, out _))
             .WithMessage("invalid message id");
     }
-
+    
     protected override bool PreValidate(
-        ValidationContext<DeleteMessageRequest> context,
+        ValidationContext<DeleteMessageRequestRpc> context,
         ValidationResult result)
     {
         if (context.InstanceToValidate == null)
@@ -24,7 +23,7 @@ internal sealed class DeleteMessageRequestValidator : AbstractValidator<DeleteMe
             result.Errors.Add(new ValidationFailure("", "invalid or null request"));
             return false;
         }
-
+    
         return base.PreValidate(context, result);
     }
 }

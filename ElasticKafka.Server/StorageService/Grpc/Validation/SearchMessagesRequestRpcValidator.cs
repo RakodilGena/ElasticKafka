@@ -1,28 +1,28 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
-using GatewayService.Messages.Models.Requests;
+using MessagingService;
 
-namespace GatewayService.Messages.Validation;
+namespace StorageService.Grpc.Validation;
 
-internal sealed class SearchMessagesRequestValidator : AbstractValidator<SearchMessagesRequest>
+internal sealed class SearchMessagesRequestRpcValidator : AbstractValidator<SearchMessagesRequestRpc>
 {
-    public SearchMessagesRequestValidator()
+    public SearchMessagesRequestRpcValidator()
     {
-        RuleFor(x => x!.Count)
+        RuleFor(x => x.Count)
             .GreaterThan(0)
             .WithMessage("invalid count");
-
-        RuleFor(x => x!.Offset)
+        
+        RuleFor(x => x.Offset)
             .GreaterThanOrEqualTo(0)
             .WithMessage("invalid offset");
-
-        RuleFor(x => x!.Filter)
+        
+        RuleFor(x => x.Filter)
             .NotEmpty()
             .WithMessage("invalid search filter");
     }
 
     protected override bool PreValidate(
-        ValidationContext<SearchMessagesRequest> context,
+        ValidationContext<SearchMessagesRequestRpc> context,
         ValidationResult result)
     {
         if (context.InstanceToValidate == null)

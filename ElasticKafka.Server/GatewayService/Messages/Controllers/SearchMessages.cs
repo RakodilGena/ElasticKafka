@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using GatewayService.Messages.Mapping;
 using GatewayService.Messages.Models.Requests;
+using GatewayService.Messages.Models.Responses;
 using GatewayService.Messages.Services;
 using GatewayService.Messages.Validation;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,7 @@ namespace GatewayService.Messages.Controllers;
 public partial class MessageController
 {
     [HttpGet("search")]
-    public async Task<ActionResult> SearchMessagesAsync(
+    public async Task<ActionResult<SearchMessagesResponse>> SearchMessagesAsync(
         SearchMessagesRequest request,
         [FromServices] ISearchMessagesService service,
         CancellationToken cancellationToken)
@@ -20,8 +21,6 @@ public partial class MessageController
 
         var requestDto = request.ToDto();
         
-        await service.SearchMessagesAsync(requestDto, cancellationToken);
-        
-        return Ok();
+        return await service.SearchMessagesAsync(requestDto, cancellationToken);
     }
 }

@@ -1,10 +1,10 @@
-﻿using StorageService.Kafka.Consumers.NewMessages.Models;
+﻿using StorageService.Messages.Models.Requests;
 
 namespace StorageService.Messages.Services;
 
 internal interface ICreateMessageService
 {
     Task<bool> TryCreateMessageAsync(
-        KafkaNewMessage kafkaNewMessage,
+        CreateMessageRequestDto request,
         CancellationToken cancellationToken);
 }

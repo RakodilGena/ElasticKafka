@@ -1,5 +1,6 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using MessagingService.Grpc.Validation;
 using MessagingService.Kafka.Producers.NewMessages;
 using MessagingService.Models;
 

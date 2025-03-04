@@ -64,7 +64,7 @@ public sealed class ElasticMigrator
                     props
                         .Keyword(t => t.Id)
                         .Text(
-                            t => t.MessageText,
+                            t => t.Text,
                             t => t.Analyzer("ngram_3_7_analyzer"))
                         .Date(t => t.SentAt)
                         .Date(
