@@ -62,9 +62,13 @@ internal sealed class DeleteMessageService : IDeleteMessageService
 
     private static DeleteMessageResponse BuildResponse(DeleteMessageResponseRpc rpcResponse)
     {
+        var reason = rpcResponse.Success
+            ? "OK"
+            : rpcResponse.Reason ?? "unknown";
+
         var response = new DeleteMessageResponse(
             rpcResponse.Success,
-            rpcResponse.Reason ?? "unknown");
+            reason);
 
         return response;
     }

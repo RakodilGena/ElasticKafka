@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using GatewayService.Messages.Mapping;
 using GatewayService.Messages.Models.Requests;
+using GatewayService.Messages.Models.Responses;
 using GatewayService.Messages.Services;
 using GatewayService.Messages.Validation;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,7 @@ namespace GatewayService.Messages.Controllers;
 public partial class MessageController
 {
     [HttpDelete]
-    public async Task<ActionResult> DeleteMessageAsync(
+    public async Task<ActionResult<DeleteMessageResponse>> DeleteMessageAsync(
         [FromBody] DeleteMessageRequest request,
         [FromServices] IDeleteMessageService service)
     {
@@ -19,8 +20,6 @@ public partial class MessageController
 
         var requestDto = request.ToDto();
         
-        await service.DeleteMessageAsync(requestDto);
-        
-        return Ok();
+        return await service.DeleteMessageAsync(requestDto);
     }
 }

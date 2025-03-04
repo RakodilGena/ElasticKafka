@@ -25,24 +25,23 @@ internal sealed class DeleteMessageService : IDeleteMessageService
         var response = await _client.DeleteAsync<ElasticMessage>(
             request.MessageId,
             idx => idx.Index(ElasticIndices.Messages));
-
-        //todo: bug. returns OK even if message was not present.
+        
         if (response.IsSuccess())
         {
-            _logger.LogInformation(
-                "Successfully deleted message [ID = {id}]",
-                request.MessageId);
-
-            return DeleteMessageResponseDto.OnSuccess();
-        }
-
-        if (response.ElasticsearchServerError?.Status is 404)
-        {
-            _logger.LogWarning(
-                "Message does not exist [ID = {id}]",
-                request.MessageId);
-
-            return DeleteMessageResponseDto.OnFailure("Message does not exist");
+            switch (response.ApiCallDetails.HttpStatusCode)
+            {
+                case 200:
+                    _logger.LogInformation(
+                        "Successfully deleted message [ID = {id}]",
+                        request.MessageId);
+                    return DeleteMessageResponseDto.OnSuccess();
+                
+                case 404:
+                    _logger.LogWarning(
+                        "Message does not exist [ID = {id}]",
+                        request.MessageId);
+                    return DeleteMessageResponseDto.OnFailure("Message does not exist");
+            }
         }
 
         _logger.LogError("Failed to delete message [ID = {id}]", request.MessageId);
