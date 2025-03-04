@@ -58,11 +58,11 @@ internal sealed class SearchMessagesService : ISearchMessagesService
         SearchMessagesRequestDto request,
         CancellationToken cancellationToken)
     {
-        var searchTerms = request.Filter.Split(' ',
-            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        _logger.LogInformation("Discovered search terms: {terms}",
-            string.Join(", ", searchTerms));
+        // var searchTerms = request.Filter.Split(' ',
+        //     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        //
+        // _logger.LogInformation("Discovered search terms: {terms}",
+        //     string.Join(", ", searchTerms));
 
         var response = await _client.SearchAsync<ElasticMessage>(
             s => s
@@ -72,7 +72,7 @@ internal sealed class SearchMessagesService : ISearchMessagesService
                 .Query(q => q
                     .Match(m => m
                         .Field(f => f.Text)
-                        .Query(request.Filter)
+                        .Query(request.Filter.ToLower())
                     )
                 )
                 .Sort(sort => sort.Field(

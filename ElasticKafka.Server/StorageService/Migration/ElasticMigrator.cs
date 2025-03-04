@@ -52,10 +52,15 @@ public sealed class ElasticMigrator
                             .TokenChars([TokenChar.Letter, TokenChar.Digit, TokenChar.Whitespace])
                         )
                     )
+                    //important for case-insensitive search
+                    .TokenFilters(tf => tf
+                            .Lowercase("lowercase_filter") // Add lowercase filter
+                    )
                     .Analyzers(an => an
                         .Custom("ngram_3_7_analyzer", ca => ca
                             //.CharFilter(["punctuation_remover"])  // Apply punctuation filter
                             .Tokenizer("ngram_3_7_tokenizer")
+                            .Filter(["lowercase_filter"])// Apply the lowercase filter
                         )
                     )
                 )
