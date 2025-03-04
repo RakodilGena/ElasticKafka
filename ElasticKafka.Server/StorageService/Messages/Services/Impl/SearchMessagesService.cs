@@ -72,7 +72,7 @@ internal sealed class SearchMessagesService : ISearchMessagesService
                 .Query(q => q
                     .Match(m => m
                         .Field(f => f.Text)
-                        .Query(request.Filter.ToLower())
+                        .Query(request.Filter)//.ToLower()) works regardless 
                     )
                 )
                 .Sort(sort => sort.Field(
