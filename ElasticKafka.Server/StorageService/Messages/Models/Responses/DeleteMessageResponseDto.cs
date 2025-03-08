@@ -2,13 +2,12 @@
 
 public sealed class DeleteMessageResponseDto
 {
-    public bool Success { get; init; }
-    public string? Reason { get; init; }
-    
     private DeleteMessageResponseDto()
     {
-        
     }
+
+    public bool Success { get; init; }
+    public string? Reason { get; init; }
 
     public static DeleteMessageResponseDto OnSuccess()
     {

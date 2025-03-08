@@ -7,5 +7,5 @@ public interface ISearchMessagesService
 {
     Task<SearchMessagesResponse> SearchMessagesAsync(
         SearchMessagesRequestDto request,
-        CancellationToken cancellationToken); 
+        CancellationToken cancellationToken);
 }

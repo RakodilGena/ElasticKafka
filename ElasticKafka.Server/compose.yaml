@@ -1,11 +1,11 @@
 ﻿volumes:
   kafka-1-data:
   kafka-2-data:
-  kafka-3-data:   
+  kafka-3-data:
   elastic-1-data:
   elastic-2-data:
   elastic-3-data:
-    
+
 services:
   
   #Important node: minimum THREE elastic nodes required for successful master-election-quorum
@@ -57,7 +57,7 @@ services:
     volumes:
       - elastic-2-data:/usr/share/elasticsearch/data
     restart: on-failure
-    
+  
   elastic-3:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.2
     container_name: elastic-3
@@ -81,16 +81,16 @@ services:
     volumes:
       - elastic-3-data:/usr/share/elasticsearch/data
     restart: on-failure
-    
-    
+  
+  
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     restart: on-failure
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
-      
-    
-
+  
+  
+  
   kafka-1:
     image: confluentinc/cp-kafka:latest
     restart: on-failure
@@ -107,7 +107,7 @@ services:
       KAFKA_LISTENERS: LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29091
       KAFKA_ADVERTISED_LISTENERS: LISTENER_INTERNAL://kafka-1:9091,LISTENER_LOCAL://localhost:29091
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INTERNAL:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
-        
+      
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
     volumes:
@@ -160,10 +160,10 @@ services:
       - kafka-3-data:/var/lib/kafka3/data
     depends_on:
       - zookeeper
-        
-        
-        
-#  automatically creates requested kafka topics
+  
+  
+  
+  #  automatically creates requested kafka topics
   init-topics:
     image: confluentinc/cp-kafka:latest
     depends_on:
@@ -184,15 +184,15 @@ services:
       echo -e 'Successfully created the following topics:'
       kafka-topics --bootstrap-server kafka-1:9091 --list
       "
-      
-      
+  
+  
   redis:
     image: redis:latest
     container_name: redis
     ports:
       - "6379:6379"
     restart: on-failure
-
+  
   
   gateway-service-1:
     image: gatewayservice
@@ -221,7 +221,7 @@ services:
       - kafka-3
       - service-discovery-1
       - service-discovery-2
-      
+  
   gateway-service-2:
     image: gatewayservice
     restart: on-failure
@@ -230,7 +230,7 @@ services:
       dockerfile: GatewayService/Dockerfile
     ports:
       - "5102:8080"
-    environment:      
+    environment:
       #without HTTP, important!
       "ServiceDiscoveryUrls:Value": "service-discovery-2:8080,service-discovery-1:8080"
 
@@ -264,7 +264,7 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
-          
+  
   messaging-service-2:
     image: messagingservice
     restart: on-failure
@@ -279,8 +279,8 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
-        
-    
+  
+  
   messaging-service-3:
     image: messagingservice
     restart: on-failure
@@ -296,8 +296,8 @@ services:
       - kafka-2
       - kafka-3
   
-      
-      
+  
+  
   storage-service-1:
     image: storageservice
     restart: on-failure
@@ -307,34 +307,13 @@ services:
     environment:
       "Kafka:Producer:MessageCreatedEventsTopic": "MessageCreatedEvents"
       "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
-      "Kafka:Consumers:NewMessages:Topic": "NewMessages"
-      "Kafka:Consumers:NewMessages:Config:GroupId": "messaging_service_new_messages"
-      "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
-      "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
-      "Elastic:Nodes": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
-    depends_on:
-      - redis
-      - kafka-1
-      - kafka-2
-      - kafka-3
-      - elastic-1
-      - elastic-2
-      - elastic-3
-      - storage-service-migrator
+      "Kafka:Producer:Config:MessageTimeoutMs": "10000"
       
-  storage-service-2:
-    image: storageservice
-    restart: on-failure
-    build:
-      context: .
-      dockerfile: StorageService/Dockerfile
-    environment:
-      "Kafka:Producer:MessageCreatedEventsTopic": "MessageCreatedEvents"
-      "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
       "Kafka:Consumers:NewMessages:Topic": "NewMessages"
       "Kafka:Consumers:NewMessages:Config:GroupId": "messaging_service_new_messages"
       "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
       "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
+      
       "Elastic:Nodes": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
     depends_on:
       - redis
@@ -346,8 +325,7 @@ services:
       - elastic-3
       - storage-service-migrator
   
-    
-  storage-service-3:
+  storage-service-2:
     image: storageservice
     restart: on-failure
     build:
@@ -356,10 +334,13 @@ services:
     environment:
       "Kafka:Producer:MessageCreatedEventsTopic": "MessageCreatedEvents"
       "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Producer:Config:MessageTimeoutMs": "10000"
+      
       "Kafka:Consumers:NewMessages:Topic": "NewMessages"
       "Kafka:Consumers:NewMessages:Config:GroupId": "messaging_service_new_messages"
       "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
-      "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false" 
+      "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
+      
       "Elastic:Nodes": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
     depends_on:
       - redis
@@ -370,7 +351,35 @@ services:
       - elastic-2
       - elastic-3
       - storage-service-migrator
-        
+  
+  
+  storage-service-3:
+    image: storageservice
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: StorageService/Dockerfile
+    environment:
+      "Kafka:Producer:MessageCreatedEventsTopic": "MessageCreatedEvents"
+      "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Producer:Config:MessageTimeoutMs": "10000"
+      
+      "Kafka:Consumers:NewMessages:Topic": "NewMessages"
+      "Kafka:Consumers:NewMessages:Config:GroupId": "messaging_service_new_messages"
+      "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
+      "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
+      
+      "Elastic:Nodes": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
+    depends_on:
+      - redis
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - elastic-1
+      - elastic-2
+      - elastic-3
+      - storage-service-migrator
+  
   storage-service-migrator:
     image: storageservice
     restart: on-failure #will actually restart until elastic reached and index created / exists checked
@@ -384,14 +393,14 @@ services:
       - elastic-1
       - elastic-2
       - elastic-3
-    
+  
   service-discovery-1:
     image: servicediscovery
     restart: on-failure
     build:
       context: .
       dockerfile: ServiceDiscovery/Dockerfile
-    environment:      
+    environment:
       "ServiceUrls:MessagingServices": "http://messaging-service-1:8080,http://messaging-service-2:8080,http://messaging-service-3:8080"
       "ServiceUrls:StorageServices": "http://storage-service-1:8080,http://storage-service-2:8080,http://storage-service-3:8080"
 

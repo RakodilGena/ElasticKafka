@@ -11,11 +11,11 @@ internal sealed class SearchMessagesRequestRpcValidator : AbstractValidator<Sear
         RuleFor(x => x.Count)
             .GreaterThan(0)
             .WithMessage("invalid count");
-        
+
         RuleFor(x => x.Offset)
             .GreaterThanOrEqualTo(0)
             .WithMessage("invalid offset");
-        
+
         RuleFor(x => x.Filter)
             .NotEmpty()
             .WithMessage("invalid search filter");

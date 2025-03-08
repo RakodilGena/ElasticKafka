@@ -71,11 +71,10 @@ internal sealed class ServiceUrlsStreamer : ServiceDiscoveryRpc.ServiceDiscovery
             _logger.LogInformation("No listeners found, skipping.");
             return;
         }
-        
+
         var serviceUrls = BuildUrlsRpc();
 
         foreach (var listener in currentListeners)
-        {
             try
             {
                 await listener.StreamWriter.WriteAsync(serviceUrls);
@@ -90,24 +89,24 @@ internal sealed class ServiceUrlsStreamer : ServiceDiscoveryRpc.ServiceDiscovery
                         "removed listener [{id}] on error",
                         listenerId);
                 }
-                
-                _logger.LogError(e, 
+
+                _logger.LogError(e,
                     "Error while broadcasting service urls to listener [{listenerId}]",
                     listenerId);
             }
-        }
-        
+
         _logger.LogInformation("Successfully broadcast service urls");
     }
 
     private ServiceUrlsRpc BuildUrlsRpc()
     {
         var urls = _serviceUrlsMonitor.CurrentValue;
-        
-        _logger.LogInformation("To broadcast: Messaging services: [{messagingServices}], Storage services: [{storageServices}]",
+
+        _logger.LogInformation(
+            "To broadcast: Messaging services: [{messagingServices}], Storage services: [{storageServices}]",
             urls.MessagingServices,
             urls.StorageServices);
-        
+
         var messagingServicesUrls = urls.MessagingServices.Split(",");
         var storageServicesUrls = urls.StorageServices.Split(",");
 

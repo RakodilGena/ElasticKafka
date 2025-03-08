@@ -6,7 +6,7 @@ internal sealed class ServiceDiscoveryBackgroundService : BackgroundService
     private readonly ILogger<ServiceDiscoveryBackgroundService> _logger;
 
     public ServiceDiscoveryBackgroundService(
-        ServiceUrlsStreamer serviceDiscovery, 
+        ServiceUrlsStreamer serviceDiscovery,
         ILogger<ServiceDiscoveryBackgroundService> logger)
     {
         _serviceDiscovery = serviceDiscovery;
@@ -16,25 +16,23 @@ internal sealed class ServiceDiscoveryBackgroundService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Starting serviceDiscoveryBackgroundService");
-        
+
         while (!stoppingToken.IsCancellationRequested)
-        {
             try
             {
                 await _serviceDiscovery.BroadcastServiceUrlsAsync();
-            
+
                 await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, 
+                _logger.LogError(e,
                     "Error occured while broadcasting service urls");
-                
+
                 if (stoppingToken.IsCancellationRequested)
                     return;
-                
+
                 await Task.Delay(TimeSpan.FromSeconds(1), CancellationToken.None);
             }
-        }
     }
 }

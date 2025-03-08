@@ -77,7 +77,7 @@ internal sealed class CreateMessageService : ICreateMessageService
         {
             MessageId = id.ToString(),
             MessageText = request.MessageText,
-            SentAt = Timestamp.FromDateTimeOffset(request.SentAt),
+            SentAt = Timestamp.FromDateTimeOffset(request.SentAt)
         };
 
         return rpcRequest;

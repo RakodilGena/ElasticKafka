@@ -18,9 +18,9 @@ public partial class MessageController
         await validator.ValidateAndThrowAsync(request);
 
         var requestDto = request.ToDto();
-        
+
         await service.SendMessageAsync(requestDto);
-        
+
         return Ok();
     }
 }

@@ -19,6 +19,7 @@ internal sealed class StorageServiceUrlProvider :
             {
                 throw new Exception("No urls discovered yet.");
             }
+            
             _currentUrlIndex = (_currentUrlIndex + 1) % _urls.Length;
             return _urls[_currentUrlIndex];
         }

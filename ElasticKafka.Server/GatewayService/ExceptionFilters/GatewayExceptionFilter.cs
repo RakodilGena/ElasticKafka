@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace GatewayService.ExceptionFilters;
 
-
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public sealed class GatewayExceptionFilter : ExceptionFilterAttribute
 {

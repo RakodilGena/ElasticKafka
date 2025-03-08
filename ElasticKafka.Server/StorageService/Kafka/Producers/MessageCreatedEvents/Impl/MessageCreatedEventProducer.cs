@@ -33,7 +33,7 @@ internal sealed class MessageCreatedEventProducer : IMessageCreatedEventProducer
         await ProduceMessageWithRetryAsync(producer, kafkaMessage, ct);
 
         _logger.LogInformation(
-            "Message created event [Message ID:{messageId}] produced successfully", 
+            "Message created event [Message ID:{messageId}] produced successfully",
             messageId);
     }
 
@@ -41,7 +41,7 @@ internal sealed class MessageCreatedEventProducer : IMessageCreatedEventProducer
         Guid messageId)
     {
         var idString = messageId.ToString();
-        
+
         //key is there to determine the partition (hash -> partition)
         return new Message<string, string>
         {
@@ -49,7 +49,7 @@ internal sealed class MessageCreatedEventProducer : IMessageCreatedEventProducer
             Value = idString
         };
     }
-    
+
     private async Task ProduceMessageWithRetryAsync(
         IProducer<string, string> producer,
         Message<string, string> message,
@@ -64,10 +64,10 @@ internal sealed class MessageCreatedEventProducer : IMessageCreatedEventProducer
             try
             {
                 await producer.ProduceAsync(
-                    _config.Value.MessageCreatedEventsTopic, 
+                    _config.Value.MessageCreatedEventsTopic,
                     message,
                     ct);
-                
+
                 return;
             }
             catch (Exception e)

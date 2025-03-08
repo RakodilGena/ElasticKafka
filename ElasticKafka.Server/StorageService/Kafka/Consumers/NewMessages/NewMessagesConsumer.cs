@@ -13,20 +13,17 @@ namespace StorageService.Kafka.Consumers.NewMessages;
 
 internal sealed class NewMessagesConsumer : BackgroundService
 {
-    private readonly IConsumerProvider _consumerProvider;
     private readonly IOptions<NewMessagesConsumerConfig> _config;
-    
+    private readonly IConsumerProvider _consumerProvider;
     private readonly ICreateMessageService _createMessageService;
+    private readonly KafkaNewMessageValidator _kafkaNewMessageValidator = new();
     private readonly IMessageCreatedEventProducer _messageCreatedEventProducer;
-    
     private readonly ILogger<NewMessagesConsumer> _logger;
 
-    private readonly KafkaNewMessageValidator _kafkaNewMessageValidator = new();
-
     public NewMessagesConsumer(
-        IConsumerProvider consumerProvider, 
-        IOptions<NewMessagesConsumerConfig> config, 
-        ICreateMessageService createMessageService, 
+        IConsumerProvider consumerProvider,
+        IOptions<NewMessagesConsumerConfig> config,
+        ICreateMessageService createMessageService,
         IMessageCreatedEventProducer messageCreatedEventProducer,
         ILogger<NewMessagesConsumer> logger)
     {
@@ -113,7 +110,7 @@ internal sealed class NewMessagesConsumer : BackgroundService
 
         _logger.LogInformation("Received NewMessage with ID: [{messageID}]", kafkaNewMessage.Id);
 
-        bool saved = await TrySaveMessageAsync(
+        var saved = await TrySaveMessageAsync(
             kafkaNewMessage,
             ct);
 
@@ -136,7 +133,7 @@ internal sealed class NewMessagesConsumer : BackgroundService
             message.Id,
             message.Text,
             message.SentAt);
-        
+
         return await _createMessageService.TryCreateMessageAsync(request, ct);
     }
 

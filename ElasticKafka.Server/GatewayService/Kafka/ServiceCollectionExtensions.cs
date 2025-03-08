@@ -15,8 +15,10 @@ internal static class ServiceCollectionExtensions
                 (opt, config) =>
                     config
                         .GetSection(MessageCreatedEventConsumerConfig.SectionName)
-                        .Bind(opt));
-        
+                        .Bind(opt))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services
             .AddSingleton<IConsumerProvider, ConsumerProvider>()
             .AddHostedService<MessageCreatedEventsConsumer>();

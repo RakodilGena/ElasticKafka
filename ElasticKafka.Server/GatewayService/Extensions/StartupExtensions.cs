@@ -14,7 +14,7 @@ internal static class StartupExtensions
             {
                 Version = "v1",
                 Title = "ElasticKafka API",
-                Description = "ElasticKafka app gateway API",
+                Description = "ElasticKafka app gateway API"
 
                 // TermsOfService = new Uri("https://example.com/terms"),
                 //
@@ -61,7 +61,7 @@ internal static class StartupExtensions
 
         return services;
     }
-    
+
     public static IServiceCollection AddCorsDefaultPolicy(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -73,7 +73,7 @@ internal static class StartupExtensions
         string[] allowedOrigins = !string.IsNullOrEmpty(allowOrigins)
             ? allowOrigins.Split(",")
             : [];
-        
+
         services.AddCors(options =>
         {
             options.AddDefaultPolicy(

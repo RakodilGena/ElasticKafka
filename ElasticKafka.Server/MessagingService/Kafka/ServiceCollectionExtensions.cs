@@ -16,12 +16,14 @@ internal static class ServiceCollectionExtensions
                 (opt, config) =>
                     config
                         .GetSection(KafkaProducerConfig.SectionName)
-                        .Bind(opt));
-        
+                        .Bind(opt))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services
             .AddSingleton<IProducerProvider, ProducerProvider>()
             .AddScoped<INewMessageProducer, NewMessageProducer>();
-        
+
         return services;
     }
 }

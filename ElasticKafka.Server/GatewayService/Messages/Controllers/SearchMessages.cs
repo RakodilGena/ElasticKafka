@@ -20,7 +20,7 @@ public partial class MessageController
         await validator.ValidateAndThrowAsync(request, cancellationToken);
 
         var requestDto = request.ToDto();
-        
+
         return await service.SearchMessagesAsync(requestDto, cancellationToken);
     }
 }

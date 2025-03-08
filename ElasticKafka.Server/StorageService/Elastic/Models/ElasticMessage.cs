@@ -1,7 +1,6 @@
 ﻿namespace StorageService.Elastic.Models;
 
 /// <summary>
-/// 
 /// </summary>
 /// <param name="Id">Indexed</param>
 /// <param name="Text">NGram Indexed</param>

@@ -60,7 +60,6 @@ internal sealed class GetMessagesService : IGetMessagesService
                 .Sort(sort => sort.Field(
                         f => f.SentAt,
                         f => f.Order(SortOrder.Desc)) // Newest first
-
                 ), cancellationToken);
 
         return response;

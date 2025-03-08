@@ -1,12 +1,13 @@
-﻿using Confluent.Kafka;
+﻿using System.ComponentModel.DataAnnotations;
+using Confluent.Kafka;
 
 namespace MessagingService.Kafka.Producers.Config;
 
 internal sealed class KafkaProducerConfig
 {
     public const string SectionName = "Kafka:Producer";
-    
-    public string NewMessagesTopic { get; set; } = null!;
-    
-    public ProducerConfig Config { get; set; } = null!;
+
+    [Required] public string NewMessagesTopic { get; set; } = null!;
+
+    [Required] public ProducerConfig Config { get; set; } = null!;
 }

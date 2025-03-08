@@ -36,11 +36,11 @@ internal sealed class NewMessageProducer : INewMessageProducer
         var producer = _producerProvider.Get();
 
         var kafkaMessage = ToKafka(request);
-        
+
         await ProduceMessageWithRetryAsync(producer, kafkaMessage, ct);
-        
+
         _logger.LogInformation(
-            "New message [{messageId}] produced successfully", 
+            "New message [{messageId}] produced successfully",
             messageId);
     }
 
@@ -78,10 +78,10 @@ internal sealed class NewMessageProducer : INewMessageProducer
             try
             {
                 await producer.ProduceAsync(
-                    _config.Value.NewMessagesTopic, 
-                    message, 
+                    _config.Value.NewMessagesTopic,
+                    message,
                     ct);
-                
+
                 return;
             }
             catch (Exception e)

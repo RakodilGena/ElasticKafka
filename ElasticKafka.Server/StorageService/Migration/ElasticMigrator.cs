@@ -22,18 +22,16 @@ public sealed class ElasticMigrator
         if (existsResponse.Exists)
         {
             logger.LogInformation("Index \"{idx}\" already exists, skipping.", messagesIndex);
-            
+
             //await client.Indices.DeleteAsync(messagesIndex);
-            
+
             return;
         }
 
         var createIndexResponse = await client.Indices.CreateAsync(messagesIndex, c => c
             .Settings(s => s
                 .MaxNgramDiff(4) //for ngrams NECESSARY
-
                 .NumberOfShards(3) // Distribute data across 3 primary shards
-
                 .NumberOfReplicas(2) // Keep 2 replicas for fault tolerance
 
                 //todo add case insentiveness
@@ -58,9 +56,9 @@ public sealed class ElasticMigrator
                     )
                     .Analyzers(an => an
                         .Custom("ngram_3_7_analyzer", ca => ca
-                            //.CharFilter(["punctuation_remover"])  // Apply punctuation filter
-                            .Tokenizer("ngram_3_7_tokenizer")
-                            .Filter(["lowercase_filter"])// Apply the lowercase filter
+                                //.CharFilter(["punctuation_remover"])  // Apply punctuation filter
+                                .Tokenizer("ngram_3_7_tokenizer")
+                                .Filter(["lowercase_filter"]) // Apply the lowercase filter
                         )
                     )
                 )

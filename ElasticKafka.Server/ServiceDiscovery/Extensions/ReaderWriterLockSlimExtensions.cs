@@ -9,7 +9,7 @@ internal static class ReaderWriterLockSlimExtensions
         @lock.EnterReadLock();
         return new ReaderWriterLockSlimReadHook(@lock);
     }
-    
+
     public static ReaderWriterLockSlimWriteHook EnterWriteHook(this ReaderWriterLockSlim @lock)
     {
         @lock.EnterWriteLock();

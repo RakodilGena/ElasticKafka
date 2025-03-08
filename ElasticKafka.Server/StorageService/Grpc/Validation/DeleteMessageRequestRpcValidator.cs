@@ -13,7 +13,7 @@ internal sealed class DeleteMessageRequestRpcValidator : AbstractValidator<Delet
             .Must(x => Guid.TryParse(x, out _))
             .WithMessage("invalid message id");
     }
-    
+
     protected override bool PreValidate(
         ValidationContext<DeleteMessageRequestRpc> context,
         ValidationResult result)
@@ -23,7 +23,7 @@ internal sealed class DeleteMessageRequestRpcValidator : AbstractValidator<Delet
             result.Errors.Add(new ValidationFailure("", "invalid or null request"));
             return false;
         }
-    
+
         return base.PreValidate(context, result);
     }
 }

@@ -19,7 +19,7 @@ public partial class MessageController
         await validator.ValidateAndThrowAsync(request);
 
         var requestDto = request.ToDto();
-        
+
         return await service.DeleteMessageAsync(requestDto);
     }
 }

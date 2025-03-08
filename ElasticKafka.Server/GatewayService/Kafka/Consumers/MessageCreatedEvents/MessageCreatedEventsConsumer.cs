@@ -7,10 +7,10 @@ namespace GatewayService.Kafka.Consumers.MessageCreatedEvents;
 
 internal sealed class MessageCreatedEventsConsumer : BackgroundService
 {
-    private readonly IServiceScopeFactory _serviceScopeFactory;
-    private readonly ILogger<MessageCreatedEventsConsumer> _logger;
-    private readonly IConsumerProvider _consumerProvider;
     private readonly IOptions<MessageCreatedEventConsumerConfig> _config;
+    private readonly IConsumerProvider _consumerProvider;
+    private readonly ILogger<MessageCreatedEventsConsumer> _logger;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
     public MessageCreatedEventsConsumer(
         IServiceScopeFactory serviceScopeFactory,

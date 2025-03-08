@@ -56,7 +56,7 @@ internal static class ServiceCollectionExtensions
 
         configuration.GetSection(ServiceDiscoveryUrls.SectionName)
             .Bind(serviceDiscoveryUrls);
-        
+
         if (serviceDiscoveryUrls.Value is null)
             throw new Exception($"{ServiceDiscoveryUrls.SectionName} are not configured");
 
@@ -77,62 +77,64 @@ internal static class ServiceCollectionExtensions
         // services.AddSingleton<ResolverFactory>(resolverFactory);
 
         services.AddGrpcClient<ServiceDiscoveryRpc.ServiceDiscoveryRpcClient>(o =>
-        {
-            // Define static resolver factory with multiple addresses
-            o.Address = new Uri("static:///");
-            
-            o.ChannelOptionsActions.Add(options =>
             {
-                options.ServiceConfig = new ServiceConfig
+                // Define static resolver factory with multiple addresses
+                o.Address = new Uri("static:///");
+
+                o.ChannelOptionsActions.Add(options =>
                 {
-                    LoadBalancingConfigs = { new RoundRobinConfig() },
-                    MethodConfigs =
+                    options.ServiceConfig = new ServiceConfig
                     {
-                        new MethodConfig
+                        LoadBalancingConfigs = { new RoundRobinConfig() },
+                        MethodConfigs =
                         {
-                            //for all methods
-                            Names = { MethodName.Default },
-                            RetryPolicy = new RetryPolicy
+                            new MethodConfig
                             {
-                                // Retry up to 5 times
-                                MaxAttempts = 5,
-                                InitialBackoff = TimeSpan.FromSeconds(1),
-                                MaxBackoff = TimeSpan.FromSeconds(5),
+                                //for all methods
+                                Names = { MethodName.Default },
+                                RetryPolicy = new RetryPolicy
+                                {
+                                    // Retry up to 5 times
+                                    MaxAttempts = 5,
+                                    InitialBackoff = TimeSpan.FromSeconds(1),
+                                    MaxBackoff = TimeSpan.FromSeconds(5),
 
-                                //1 sec -> 2 -> 4 -> 5 -> 5 (cz of BackOff)
-                                BackoffMultiplier = 2,
+                                    //1 sec -> 2 -> 4 -> 5 -> 5 (cz of BackOff)
+                                    BackoffMultiplier = 2,
 
-                                //only on Unavailable result
-                                RetryableStatusCodes = { StatusCode.Unavailable }
+                                    //only on Unavailable result
+                                    RetryableStatusCodes = { StatusCode.Unavailable }
+                                }
                             }
                         }
-                    }
-                };
+                    };
 
-                options.Credentials = ChannelCredentials.Insecure;
+                    options.Credentials = ChannelCredentials.Insecure;
+                });
+            })
+            .ConfigureChannel(options =>
+            {
+
+                var channelServices = new ServiceCollection();
+
+                var factory = new StaticResolverFactory(_ => addresses);
+
+                channelServices.AddSingleton<ResolverFactory>(factory);
+
+                options.ServiceProvider = channelServices.BuildServiceProvider();
+                //options.Credentials = ChannelCredentials.SecureSsl;
+            })
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                // use socket handler to support load balancing
+
+                var socketsHandler = new SocketsHttpHandler();
+                // Return `true` to allow certificates that are untrusted/invalid
+                // socketsHandler.SslOptions = new System.Net.Security.SslClientAuthenticationOptions {
+                //     RemoteCertificateValidationCallback = delegate { return true; }
+                // };
+
+                return socketsHandler;
             });
-        })
-        .ConfigureChannel(options => {
-
-            var channelServices = new ServiceCollection();
-
-            var factory = new StaticResolverFactory(_ => addresses);
-
-            channelServices.AddSingleton<ResolverFactory>(factory);
-
-            options.ServiceProvider = channelServices.BuildServiceProvider();
-            //options.Credentials = ChannelCredentials.SecureSsl;
-        })
-        .ConfigurePrimaryHttpMessageHandler(() => {
-            // use socket handler to support load balancing
-
-            var socketsHandler = new SocketsHttpHandler();
-            // Return `true` to allow certificates that are untrusted/invalid
-            // socketsHandler.SslOptions = new System.Net.Security.SslClientAuthenticationOptions {
-            //     RemoteCertificateValidationCallback = delegate { return true; }
-            // };
-
-            return socketsHandler;
-        });
     }
 }

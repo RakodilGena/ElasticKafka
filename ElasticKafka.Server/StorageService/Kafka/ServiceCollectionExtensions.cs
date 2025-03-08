@@ -18,8 +18,8 @@ internal static class ServiceCollectionExtensions
     {
         if (inMigratorMode)
             return services;
-        
-        
+
+
         //consumers---------------------------------------
         services
             .AddOptions<NewMessagesConsumerConfig>()
@@ -27,12 +27,14 @@ internal static class ServiceCollectionExtensions
                 (opt, config) =>
                     config
                         .GetSection(NewMessagesConsumerConfig.SectionName)
-                        .Bind(opt));
-        
+                        .Bind(opt))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services
             .AddSingleton<IConsumerProvider, ConsumerProvider>()
             .AddHostedService<NewMessagesConsumer>();
-        
+
 
         //producers---------------------------------------
         services
@@ -41,12 +43,14 @@ internal static class ServiceCollectionExtensions
                 (opt, config) =>
                     config
                         .GetSection(KafkaProducerConfig.SectionName)
-                        .Bind(opt));
-        
+                        .Bind(opt))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services
             .AddSingleton<IProducerProvider, ProducerProvider>()
             .AddSingleton<IMessageCreatedEventProducer, MessageCreatedEventProducer>();
-        
+
         return services;
     }
 }

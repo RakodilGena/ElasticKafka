@@ -10,10 +10,10 @@ namespace StorageService.Grpc;
 
 internal sealed class StoredMessagesService : StoredMessagesServiceRpc.StoredMessagesServiceRpcBase
 {
-    private readonly ILogger<StoredMessagesService> _logger;
     private readonly IDeleteMessageService _deleteMessageService;
     private readonly IGetMessagesService _getMessagesService;
     private readonly ISearchMessagesService _searchMessagesService;
+    private readonly ILogger<StoredMessagesService> _logger;
 
     public StoredMessagesService(
         ILogger<StoredMessagesService> logger,
@@ -33,7 +33,7 @@ internal sealed class StoredMessagesService : StoredMessagesServiceRpc.StoredMes
         ServerCallContext context)
     {
         _logger.LogInformation("Processing DeleteMessage");
-        
+
         var validator = new DeleteMessageRequestRpcValidator();
         await validator.ValidateAndThrowAsync(request);
 
@@ -51,7 +51,7 @@ internal sealed class StoredMessagesService : StoredMessagesServiceRpc.StoredMes
         ServerCallContext context)
     {
         _logger.LogInformation("Processing GetMessages");
-        
+
         var validator = new GetMessagesRequestRpcValidator();
         await validator.ValidateAndThrowAsync(request);
 
@@ -70,7 +70,7 @@ internal sealed class StoredMessagesService : StoredMessagesServiceRpc.StoredMes
         ServerCallContext context)
     {
         _logger.LogInformation("Processing SearchMessages");
-        
+
         var validator = new SearchMessagesRequestRpcValidator();
         await validator.ValidateAndThrowAsync(request);
 

@@ -5,5 +5,5 @@ namespace GatewayService.Messages.Services;
 
 public interface IDeleteMessageService
 {
-    Task<DeleteMessageResponse> DeleteMessageAsync(DeleteMessageRequestDto request);   
+    Task<DeleteMessageResponse> DeleteMessageAsync(DeleteMessageRequestDto request);
 }

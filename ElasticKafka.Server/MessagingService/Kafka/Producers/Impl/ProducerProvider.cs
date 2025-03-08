@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace MessagingService.Kafka.Producers.Impl;
 
-internal sealed class ProducerProvider: IDisposable, IProducerProvider
+internal sealed class ProducerProvider : IDisposable, IProducerProvider
 {
     private readonly IProducer<string, string> _producer;
 

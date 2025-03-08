@@ -53,7 +53,6 @@ internal sealed class SearchMessagesService : ISearchMessagesService
     }
 
 
-
     private async Task<SearchResponse<ElasticMessage>> QueryMessagesAsync(
         SearchMessagesRequestDto request,
         CancellationToken cancellationToken)
@@ -71,14 +70,13 @@ internal sealed class SearchMessagesService : ISearchMessagesService
                 .From(request.Offset) // Skip results
                 .Query(q => q
                     .Match(m => m
-                        .Field(f => f.Text)
-                        .Query(request.Filter)//.ToLower()) works regardless 
+                            .Field(f => f.Text)
+                            .Query(request.Filter) //.ToLower()) works regardless 
                     )
                 )
                 .Sort(sort => sort.Field(
                         f => f.SentAt,
                         f => f.Order(SortOrder.Desc)) // Newest first
-
                 ), cancellationToken);
 
         return response;

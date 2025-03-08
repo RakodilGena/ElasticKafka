@@ -54,7 +54,7 @@ internal sealed class DeleteMessageService : IDeleteMessageService
     {
         var rpcRequest = new DeleteMessageRequestRpc
         {
-            MessageId = request.MessageId.ToString(),
+            MessageId = request.MessageId.ToString()
         };
 
         return rpcRequest;

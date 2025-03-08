@@ -11,11 +11,11 @@ internal static class ServiceCollectionExtensions
             .BindConfiguration(ServiceUrls.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         services.AddSingleton<ServiceUrlsStreamer>();
-        
+
         services.AddHostedService<ServiceDiscoveryBackgroundService>();
-        
+
         return services;
     }
 }

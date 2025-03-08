@@ -11,11 +11,12 @@ internal static class ServiceCollectionExtensions
         {
             throw new Exception("Redis connection string is missing.");
         }
-        
+
+
         services.AddSignalR().AddStackExchangeRedis(redisConnection);
-        
+
         services.AddScoped<IMessageCreatedEventsHubWrapper, MessageCreatedEventsHubWrapper>();
-        
+
         return services;
     }
 
