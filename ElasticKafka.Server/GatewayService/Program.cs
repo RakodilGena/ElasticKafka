@@ -23,7 +23,7 @@ builder.Services
     .AddCustomSignalR(builder.Configuration)
     .AddSwagger()
     .AddCorsDefaultPolicy(builder.Configuration)
-    .AddServiceDiscovery();
+    .AddServiceDiscovery(builder.Configuration);
 
 var app = builder.Build();
 

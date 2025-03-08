@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "ServiceDiscovery";
+
+import "google/protobuf/empty.proto";
+
+package service_discovery;
+
+service ServiceDiscoveryRpc {
+  rpc ListenToServiceUrlsStream(google.protobuf.Empty) returns (stream ServiceUrlsRpc);
+}
+
+
+message ServiceUrlsRpc {
+  repeated string messagingServices = 1;
+  repeated string storageServices = 2;
+}

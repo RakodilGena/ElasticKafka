@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagingService", "Messagi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageService", "StorageService\StorageService.csproj", "{12B947C5-76C1-4337-9F5B-66C4D73AB90B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDiscovery", "ServiceDiscovery\ServiceDiscovery.csproj", "{3D4C43EB-F465-41B7-8F53-F6FEEBDF07DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,5 +31,9 @@ Global
 		{12B947C5-76C1-4337-9F5B-66C4D73AB90B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12B947C5-76C1-4337-9F5B-66C4D73AB90B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12B947C5-76C1-4337-9F5B-66C4D73AB90B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D4C43EB-F465-41B7-8F53-F6FEEBDF07DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D4C43EB-F465-41B7-8F53-F6FEEBDF07DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D4C43EB-F465-41B7-8F53-F6FEEBDF07DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D4C43EB-F465-41B7-8F53-F6FEEBDF07DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

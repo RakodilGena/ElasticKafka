@@ -203,8 +203,9 @@ services:
     ports:
       - "5101:8080"
     environment:
-      "MessageServicesUrls:Value": "http://messaging-service-1:8080,http://messaging-service-2:8080,http://messaging-service-3:8080"
-      "StorageServicesUrls:Value": "http://storage-service-1:8080,http://storage-service-2:8080,http://storage-service-3:8080"
+      #without HTTP, important!
+      "ServiceDiscoveryUrls:Value": "service-discovery-1:8080,service-discovery-2:8080"
+      
       "Redis:ConnectionString": "redis:6379"
       
       "Kafka:Consumers:MessageCreatedEvents:Topic": "MessageCreatedEvents"
@@ -218,6 +219,8 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
+      - service-discovery-1
+      - service-discovery-2
       
   gateway-service-2:
     image: gatewayservice
@@ -227,9 +230,9 @@ services:
       dockerfile: GatewayService/Dockerfile
     ports:
       - "5102:8080"
-    environment:
-      "MessageServicesUrls:Value": "http://messaging-service-1:8080,http://messaging-service-2:8080,http://messaging-service-3:8080"
-      "StorageServicesUrls:Value": "http://storage-service-1:8080,http://storage-service-2:8080,http://storage-service-3:8080"
+    environment:      
+      #without HTTP, important!
+      "ServiceDiscoveryUrls:Value": "service-discovery-2:8080,service-discovery-1:8080"
 
       "Redis:ConnectionString": "redis:6379"
 
@@ -244,6 +247,8 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
+      - service-discovery-1
+      - service-discovery-2
   
   messaging-service-1:
     image: messagingservice
@@ -379,3 +384,24 @@ services:
       - elastic-1
       - elastic-2
       - elastic-3
+    
+  service-discovery-1:
+    image: servicediscovery
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: ServiceDiscovery/Dockerfile
+    environment:      
+      "ServiceUrls:MessagingServices": "http://messaging-service-1:8080,http://messaging-service-2:8080,http://messaging-service-3:8080"
+      "ServiceUrls:StorageServices": "http://storage-service-1:8080,http://storage-service-2:8080,http://storage-service-3:8080"
+
+  service-discovery-2:
+    image: servicediscovery
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: ServiceDiscovery/Dockerfile
+    environment:
+      "ServiceUrls:MessagingServices": "http://messaging-service-1:8080,http://messaging-service-2:8080,http://messaging-service-3:8080"
+      "ServiceUrls:StorageServices": "http://storage-service-1:8080,http://storage-service-2:8080,http://storage-service-3:8080"
+
