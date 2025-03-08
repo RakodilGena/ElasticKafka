@@ -61,7 +61,7 @@ public sealed class MessagingService : MessagingServiceRpc.MessagingServiceRpcBa
 
             throw new RpcException(
                 new Status(
-                    StatusCode.Aborted,
+                    StatusCode.Internal,
                     "MessagingService failed to send message"));
         }
     }
