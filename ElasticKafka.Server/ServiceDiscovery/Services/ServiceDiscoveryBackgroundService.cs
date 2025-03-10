@@ -1,4 +1,4 @@
-﻿namespace ServiceDiscovery.Grpc;
+﻿namespace ServiceDiscovery.Services;
 
 internal sealed class ServiceDiscoveryBackgroundService : BackgroundService
 {

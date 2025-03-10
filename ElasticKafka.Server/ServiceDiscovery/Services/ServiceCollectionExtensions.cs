@@ -1,6 +1,6 @@
 ﻿using ServiceDiscovery.Options;
 
-namespace ServiceDiscovery.Grpc;
+namespace ServiceDiscovery.Services;
 
 internal static class ServiceCollectionExtensions
 {

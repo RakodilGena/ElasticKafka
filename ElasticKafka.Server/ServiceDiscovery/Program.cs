@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using ServiceDiscovery.Extensions;
-using ServiceDiscovery.Grpc;
+using ServiceDiscovery.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

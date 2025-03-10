@@ -1,4 +1,4 @@
-﻿using ServiceDiscovery.Grpc;
+﻿using ServiceDiscovery.Services;
 
 namespace ServiceDiscovery.Extensions;
 

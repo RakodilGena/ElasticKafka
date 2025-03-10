@@ -3,7 +3,7 @@ using Grpc.Core;
 using Microsoft.Extensions.Options;
 using ServiceDiscovery.Options;
 
-namespace ServiceDiscovery.Grpc;
+namespace ServiceDiscovery.Services;
 
 internal sealed class ServiceUrlsStreamer : ServiceDiscoveryRpc.ServiceDiscoveryRpcBase
 {
