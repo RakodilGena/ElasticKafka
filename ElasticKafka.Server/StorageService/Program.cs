@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using StorageService.Elastic;
+using StorageService.Extensions;
 using StorageService.Grpc;
 using StorageService.Kafka;
 using StorageService.Messages.Services;
@@ -10,12 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 var inMigratorMode = builder.Configuration.InMigratorMode();
 
 //validate whether services' lifetimes are valid and correspond to each other.
-builder.WebHost.UseDefaultServiceProvider(
-    (_, options) =>
-    {
-        options.ValidateScopes = true;
-        options.ValidateOnBuild = true;
-    });
+builder.ValidateServicesLifetimes();
 
 //for grpc only
 builder.WebHost.ConfigureKestrel(options =>
@@ -23,6 +19,8 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ConfigureEndpointDefaults(x =>
         x.Protocols = HttpProtocols.Http2);
 });
+
+builder.ConfigureSerilog();
 
 builder.Services
     .AddKafka(inMigratorMode)

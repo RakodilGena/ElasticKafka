@@ -81,6 +81,19 @@ services:
     volumes:
       - elastic-3-data:/usr/share/elasticsearch/data
     restart: on-failure
+    
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.17.2
+    container_name: kibana
+    ports:
+      - "4000:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=["http://elastic-1:9200","http://elastic-2:9200","http://elastic-3:9200"]
+    depends_on:
+      - elastic-1
+      - elastic-2
+      - elastic-3
+    restart: on-failure
   
   
   zookeeper:
@@ -213,6 +226,8 @@ services:
       "Kafka:Consumers:MessageCreatedEvents:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
       "Kafka:Consumers:MessageCreatedEvents:Config:EnableAutoCommit": "false"
       
+      "Serilog:WriteTo:1:Args:NodeUris": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
+      
       "AllowOrigins": "http://localhost"
     depends_on:
       - redis
@@ -221,6 +236,9 @@ services:
       - kafka-3
       - service-discovery-1
       - service-discovery-2
+      - elastic-1
+      - elastic-2
+      - elastic-3
   
   gateway-service-2:
     image: gatewayservice
@@ -241,6 +259,8 @@ services:
       "Kafka:Consumers:MessageCreatedEvents:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
       "Kafka:Consumers:MessageCreatedEvents:Config:EnableAutoCommit": "false"
       
+      "Serilog:WriteTo:1:Args:NodeUris": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
+      
       "AllowOrigins": "http://localhost"
     depends_on:
       - redis
@@ -249,6 +269,9 @@ services:
       - kafka-3
       - service-discovery-1
       - service-discovery-2
+      - elastic-1
+      - elastic-2
+      - elastic-3
   
   messaging-service-1:
     image: messagingservice
@@ -260,10 +283,14 @@ services:
       "Kafka:Producer:NewMessagesTopic": "NewMessages"
       "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
       "Kafka:Producer:Config:MessageTimeoutMs": "10000"
+      "Serilog:WriteTo:1:Args:NodeUris": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
     depends_on:
       - kafka-1
       - kafka-2
       - kafka-3
+      - elastic-1
+      - elastic-2
+      - elastic-3
   
   messaging-service-2:
     image: messagingservice
@@ -275,10 +302,14 @@ services:
       "Kafka:Producer:NewMessagesTopic": "NewMessages"
       "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
       "Kafka:Producer:Config:MessageTimeoutMs": "10000"
+      "Serilog:WriteTo:1:Args:NodeUris": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
     depends_on:
       - kafka-1
       - kafka-2
       - kafka-3
+      - elastic-1
+      - elastic-2
+      - elastic-3
   
   
   messaging-service-3:
@@ -291,10 +322,14 @@ services:
       "Kafka:Producer:NewMessagesTopic": "NewMessages"
       "Kafka:Producer:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
       "Kafka:Producer:Config:MessageTimeoutMs": "10000"
+      "Serilog:WriteTo:1:Args:NodeUris": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
     depends_on:
       - kafka-1
       - kafka-2
       - kafka-3
+      - elastic-1
+      - elastic-2
+      - elastic-3
   
   
   
@@ -313,6 +348,8 @@ services:
       "Kafka:Consumers:NewMessages:Config:GroupId": "messaging_service_new_messages"
       "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
       "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
+      
+      "Serilog:WriteTo:1:Args:NodeUris": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
       
       "Elastic:Nodes": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
     depends_on:
@@ -340,6 +377,8 @@ services:
       "Kafka:Consumers:NewMessages:Config:GroupId": "messaging_service_new_messages"
       "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
       "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
+      
+      "Serilog:WriteTo:1:Args:NodeUris": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
       
       "Elastic:Nodes": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
     depends_on:
@@ -369,6 +408,8 @@ services:
       "Kafka:Consumers:NewMessages:Config:BootstrapServers": "kafka-1:9091,kafka-2:9092,kafka-3:9093"
       "Kafka:Consumers:NewMessages:Config:EnableAutoCommit": "false"
       
+      "Serilog:WriteTo:1:Args:NodeUris": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
+      
       "Elastic:Nodes": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
     depends_on:
       - redis
@@ -388,6 +429,7 @@ services:
       dockerfile: StorageService/Dockerfile
     environment:
       "MIGRATE": "true"
+      "Serilog:WriteTo:1:Args:NodeUris": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
       "Elastic:Nodes": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
     depends_on:
       - elastic-1
@@ -403,6 +445,7 @@ services:
     environment:
       "ServiceUrls:MessagingServices": "http://messaging-service-1:8080,http://messaging-service-2:8080,http://messaging-service-3:8080"
       "ServiceUrls:StorageServices": "http://storage-service-1:8080,http://storage-service-2:8080,http://storage-service-3:8080"
+      "Serilog:WriteTo:1:Args:NodeUris": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
 
   service-discovery-2:
     image: servicediscovery
@@ -413,4 +456,5 @@ services:
     environment:
       "ServiceUrls:MessagingServices": "http://messaging-service-1:8080,http://messaging-service-2:8080,http://messaging-service-3:8080"
       "ServiceUrls:StorageServices": "http://storage-service-1:8080,http://storage-service-2:8080,http://storage-service-3:8080"
+      "Serilog:WriteTo:1:Args:NodeUris": "http://elastic-1:9200,http://elastic-2:9200,http://elastic-3:9200"
 

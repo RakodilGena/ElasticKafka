@@ -1,7 +1,6 @@
 ﻿using Serilog;
-using ServiceDiscovery.Services;
 
-namespace ServiceDiscovery.Extensions;
+namespace StorageService.Extensions;
 
 internal static class StartupExtensions
 {
@@ -27,12 +26,5 @@ internal static class StartupExtensions
             });
 
         return builder;
-    }
-    
-    public static WebApplication MapGrpcServices(this WebApplication app)
-    {
-        app.MapGrpcService<ServiceUrlsStreamer>();
-
-        return app;
     }
 }

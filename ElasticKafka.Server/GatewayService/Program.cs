@@ -7,13 +7,15 @@ using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// var info = builder.Configuration.GetValue<string>("Serilog:WriteTo:1:Args:NodeUris") 
+//            ?? "No elastic nodes for serilog found";
+// Console.WriteLine(info);
+
 //validate whether services' lifetimes are valid and correspond to each other.
-builder.WebHost.UseDefaultServiceProvider(
-    (_, options) =>
-    {
-        options.ValidateScopes = true;
-        options.ValidateOnBuild = true;
-    });
+
+builder.ValidateServicesLifetimes();
+
+builder.ConfigureSerilog();
 
 builder.Services.AddControllers();
 

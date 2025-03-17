@@ -34,7 +34,6 @@ public sealed class ElasticMigrator
                 .NumberOfShards(3) // Distribute data across 3 primary shards
                 .NumberOfReplicas(2) // Keep 2 replicas for fault tolerance
 
-                //todo add case insentiveness
                 .Analysis(a => a
                     // if needed to replace some punctuation with spaces.    
                     // .CharFilters(cf => cf
